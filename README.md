@@ -18,7 +18,3 @@
 - **Hospedagem de Arquivos**: AWS S3
 - **Autenticação**: JWT e OAuth2
 
-## Modelo de Negócio
-
-- **Taxa de Suporte e Manutenção**: R$500,00 mensais para até 20 dispositivos.
-- **Custo adicional por novo dispositivo**: R$25,00 por dispositivo extra.
