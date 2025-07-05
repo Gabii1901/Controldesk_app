@@ -8,13 +8,12 @@
 - **Histórico de Despesas**: Consulte um histórico detalhado de todas as despesas cadastradas, com opções de filtro por projeto e data.
 - **Upload de Comprovantes**: Anexe imagens de comprovantes de despesas diretamente pelo app.
 - **Relatórios Mensais**: A gestão da empresa poderá acessar um site web vinculado ao sistema, onde será possível visualizar e gerar relatórios mensais de gastos.
-- **Cadastro de Colaboradores, Filiais e Projetos**: Somente a gestão da empresa terá permissões especiais no site web para cadastrar novos colaboradores, novas filiais e novos projetos. Os projetos são apontados para filiais e colaboradores específicos.
+- **Cadastro de Colaboradores, empresas e Projetos**: Somente a gestão da empresa terá permissões especiais no site web para cadastrar novos colaboradores, novas filiais e novos projetos. Os projetos são apontados para filiais e colaboradores específicos.
 
 ## Tecnologias Utilizadas
 
-- **Frontend**: React Native
+- **Frontend**: CSS e JavaScript
 - **Backend**: Flask
-- **Banco de Dados**: PostgreSQL (hospedado na **Azure**)
-- **Hospedagem de Arquivos**: AWS S3
+- **Banco de Dados**: PostgreSQL (hospedado na **BRdrive**)
 - **Autenticação**: JWT e OAuth2
 
