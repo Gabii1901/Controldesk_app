@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Relatórios{% endblock %}
+{% block content %}
+<h2>Relatórios de Gastos</h2>
+
+<form id="relatorioForm">
+    <label for="tipoRelatorio">Escolha um relatório:</label>
+    <select id="tipoRelatorio">
+        <option value="colaborador">Gastos Mensais por Colaborador</option>
+        <option value="cartao">Gastos Mensais por Cartão</option>
+        <option value="projeto">Gastos Mensais por Projeto</option>
+        <option value="empresa">Gastos Mensais por Empresa</option>
+    </select>
+    <button type="submit">Gerar Relatório</button>
+</form>
+
+<div id="resultadoRelatorio"></div>
+
+<script>
+    document.getElementById("relatorioForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        let tipo = document.getElementById("tipoRelatorio").value;
+        fetch(`http://127.0.0.1:5000/relatorio/${tipo}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("resultadoRelatorio").innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        });
+    });
+</script>
+{% endblock %}

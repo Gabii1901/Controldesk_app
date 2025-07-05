@@ -1,0 +1,71 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8;
+    text-align: center;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.btn-voltar {
+    background-color: red;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.btn-empresas {
+    background-color: orange;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    font-size: 18px;
+    border-radius: 10px;
+    margin: 20px;
+}
+
+.lista-empresas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.empresa-card {
+    background-color: #90ee90;
+    padding: 15px;
+    width: 400px;
+    margin: 10px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.edit-btn {
+    text-decoration: none;
+    font-size: 20px;
+    color: black;
+}
+
+.cadastro {
+    background-color: #c0ffc0;
+}
+
+.add-btn {
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+}
