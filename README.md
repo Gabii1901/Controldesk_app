@@ -1,6 +1,6 @@
 # ControlDesk
 
-**ControlDesk** é uma plataforma de gerenciamento de despesas que ajuda empresas e equipes a controlar seus gastos de forma eficiente. O aplicativo é composto por um frontend em **React Native** e um backend em **Flask**, utilizando **PostgreSQL** como banco de dados hospedado na **Azure**.
+**ControlDesk** é uma plataforma de gerenciamento de despesas que ajuda empresas e equipes a controlar seus gastos de forma eficiente. O aplicativo é composto por um frontend em **React Native** e um backend em **Flask**, utilizando **PostgreSQL** como banco de dados hospedado na **BRdrive**.
 
 ## Funcionalidades
 
