@@ -1,0 +1,30 @@
+<!DOCTYPE html>  
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuários - ControlDesk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/listar_usuarios.css') }}">
+</head>
+<body>
+    <header>
+        <h1 class="title">ControlDesk</h1>
+        <a href="{{ url_for('dashboard_bp.dashboard') }}" class="btn-voltar">⮌ Voltar</a>
+    </header>
+
+    <button class="btn-usuario">Usuários</button>
+
+    <div class="lista-usuario">
+        {% for usuario in usuarios %}
+            <div class="usuario-card">
+                <span>👤 <strong>{{ usuario.nome }}</strong> — CPF: {{ usuario.cpf }}</span>
+                <a href="{{ url_for('user_bp.atualizar_usuario_page', id=usuario.id) }}" class="edit-btn">✏️</a>
+            </div>
+        {% endfor %}
+
+        <div class="usuario-card cadastro">
+            <a href="{{ url_for('user_bp.cadastro_usuario_page') }}" class="add-btn">➕ Cadastrar novo Usuário</a>
+        </div>
+    </div>
+</body>
+</html>

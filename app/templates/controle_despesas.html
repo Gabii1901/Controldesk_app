@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Controle de Despesas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/controle_despesas.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Controle de Despesas</h1>
+        <a href="{{ url_for('dashboard_bp.dashboard') }}" class="btn-voltar">⮌ Voltar</a>
+    </header>
+
+    <div class="despesa-lista">
+        {% for despesa in despesas %}
+        <div class="despesa-card">
+            <p>
+                <strong>{{ despesa.nome_colaborador }}</strong> —
+                R$ {{ "{:,.2f}".format(despesa.valor).replace(",", "X").replace(".", ",").replace("X", ".") }}
+            </p>
+            <p>{{ despesa.descricao }}</p>
+            <p>
+                <small>
+                    {% if despesa.data_registro %}
+                        {{ despesa.data_registro.strftime('%d/%m/%Y') }}
+                    {% else %}
+                        Data não informada
+                    {% endif %}
+                </small>
+            </p>
+            <a href="{{ url_for('despesa_bp.excluir_despesa', id=despesa.id) }}" 
+               onclick="return confirm('Deseja excluir esta despesa?')">🗑️ Excluir</a>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

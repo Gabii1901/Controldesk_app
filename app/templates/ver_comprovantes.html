@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Comprovantes Enviados</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/ver_comprovantes.css') }}">
+</head>
+<body>
+    <div class="container-comprovantes">
+        <h1>Comprovantes Enviados</h1>
+        <a href="{{ url_for('dashboard_bp.dashboard') }}" class="voltar">← Voltar</a>
+
+        {% for imagem in imagens %}
+            <div class="comprovante-card">
+                <img src="{{ url_for('despesa_bp.imagem_blob', id=imagem.id) }}" alt="Comprovante">
+
+                <div class="comprovante-info">
+                    <p><strong>Colaborador:</strong> {{ imagem.despesa.nome_colaborador }}</p>
+                    <p><strong>Despesa nº:</strong> {{ imagem.despesa.id }}</p>
+                    <p><strong>Enviado em:</strong> {{ imagem.data_upload.strftime('%d/%m/%Y %H:%M') }}</p>
+                    <a href="{{ url_for('despesa_bp.download_imagem', id=imagem.id) }}" class="btn-download">
+                        ⬇️ Baixar Comprovante
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

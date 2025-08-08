@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colaboradores - ControlDesk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/listar_colaboradores.css') }}">
+</head>
+<body>
+    <header>
+        <h1 class="title">ControlDesk</h1>
+        <a href="{{ url_for('dashboard_bp.dashboard') }}" class="btn-voltar">⮌ Voltar</a>
+    </header>
+
+    <button class="btn-colaboradores">Colaboradores</button>
+
+    <div class="lista-colaboradores">
+        {% for colaborador in colaboradores %}
+            <div class="colaborador-card">
+                <span>👤 {{ colaborador.nome }} - Cartão {{ colaborador.numero_cartao }}</span>
+                <a href="{{ url_for('colaborador_bp.editar_colaborador', id=colaborador.id) }}" class="edit-btn">✏️</a>
+            </div>
+        {% endfor %}
+
+        <div class="colaborador-card cadastro">
+            <a href="{{ url_for('colaborador_bp.cadastro_colaborador_page') }}" class="add-btn">➕ Cadastrar novo Colaborador</a>
+        </div>
+    </div>
+</body>
+</html>

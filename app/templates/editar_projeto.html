@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Projeto - ControlDesk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/editar_projeto.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Botão Voltar -->
+        <a href="{{ url_for('projeto_bp.listar_projetos') }}" class="btn-voltar">⮌ Voltar</a>
+
+        <!-- Título -->
+        <h1 class="title">ControlDesk</h1>
+        <button class="btn-projetos">Projetos</button>
+
+        <!-- Formulário de Edição -->
+        <form action="{{ url_for('projeto_bp.atualizar_projeto', id=projeto.id) }}" method="POST">
+            <div class="form-group">
+                <label for="nome">Nome do Projeto:</label>
+                <input type="text" id="nome" name="nome" value="{{ projeto.nome }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="local">Local:</label>
+                <input type="text" id="local" name="local" value="{{ projeto.local }}" required>
+            </div>
+
+            <!-- Empresa -->
+            <div class="form-group">
+                <label for="empresa">Empresa:</label>
+                <select id="empresa" name="empresa_id">
+                    {% for empresa in empresas %}
+                        <option value="{{ empresa.id }}" {% if empresa.id == projeto.empresa_id %}selected{% endif %}>
+                            {{ empresa.razao_social }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Status -->
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select id="status" name="status">
+                    <option value="EM ANDAMENTO" {% if projeto.status == "EM ANDAMENTO" %}selected{% endif %}>Em Andamento</option>
+                    <option value="CONCLUÍDO" {% if projeto.status == "CONCLUÍDO" %}selected{% endif %}>Concluído</option>
+                    <option value="CANCELADO" {% if projeto.status == "CANCELADO" %}selected{% endif %}>Cancelado</option>
+                </select>
+            </div>
+
+            <!-- Botões -->
+            <div class="botoes">
+                <button type="submit" class="btn-salvar">Salvar</button>
+            </div>
+        </form>
+
+        <!-- Formulário para Excluir Projeto -->
+        <form action="{{ url_for('projeto_bp.excluir_projeto', id=projeto.id) }}" method="POST">
+            <button type="submit" class="btn-excluir">Excluir Projeto</button>
+        </form>
+    </div>
+</body>
+</html>

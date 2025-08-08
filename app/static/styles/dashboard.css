@@ -1,0 +1,92 @@
+/* Estilo Global */
+body {
+    background-color: #ffffff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Estilo do Header */
+header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #ffffff;
+    z-index: 100;
+}
+
+/* Título */
+.title {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* Botão Sair - Alinhado no canto superior direito */
+.logout-container {
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    z-index: 101;
+}
+
+.sair-btn {
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.sair-btn i {
+    font-size: 18px;
+}
+
+.sair-btn:hover {
+    background-color: darkred;
+}
+
+/* Estilo do Menu */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 120px; /* Evita sobreposição com o header */
+    gap: 20px;
+}
+
+/* Botões do Menu */
+.menu-btn {
+    background-color: #ffa500;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    width: 250px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.menu-btn:hover {
+    background-color: #ff8500;
+}

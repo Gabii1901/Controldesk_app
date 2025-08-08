@@ -1,0 +1,129 @@
+/* Estilização do Corpo */
+body {
+    background-color: #b2ff91;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    flex-direction: column;
+}
+
+/* Header */
+header {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    display: flex;
+    align-items: center;
+}
+
+/* Logo */
+.logo {
+    width: 120px; /* Ajuste o tamanho conforme necessário */
+    height: auto;
+    margin-right: 10px;
+}
+
+/* Título */
+.title {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Container de Login */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Caixa de Login */
+.login-box {
+    background-color: #d4ffb2;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    text-align: center;
+}
+
+/* Ícone do Usuário */
+.user-icon {
+    width: 140px; /* Tamanho maior */
+    height: auto;
+    display: block;
+    margin: 0 auto 20px;
+}
+
+/* Labels */
+label {
+    display: block;
+    text-align: left;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Campos de Input */
+input {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Botão de Login */
+.login-btn {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    color: black;
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.login-btn:hover {
+    color: green;
+}
+
+/* Checkbox "Lembrar-me" */
+.remember-me {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+input[type="checkbox"] {
+    margin-left: 10px;
+    transform: scale(1.2);
+    accent-color: green;
+}
+
+/* Ajuste para o campo de senha com ícone */
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container input {
+    width: 100%;
+    padding-right: 40px; /* Espaço para o ícone */
+}
+
+.password-container .toggle-password {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #333;
+}

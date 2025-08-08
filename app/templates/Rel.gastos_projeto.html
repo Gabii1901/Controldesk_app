@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Relatório de Gastos por Projeto</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/Rel.gastos_mensais_col.css') }}">
+</head>
+<body>
+  <h1>Relatório de Gastos por Projeto</h1>
+  <a href="{{ url_for('relatorio_bp.listar_relatorios') }}" class="botao-voltar">← Voltar</a>
+
+  {# Datas sugeridas do mês atual #}
+  {% set hoje = datetime.utcnow() %}
+  {% set data_inicio_sugerida = hoje.replace(day=1).strftime('%Y-%m-%d') %}
+  {% set data_fim_sugerida = (hoje.replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1) %}
+  {% set data_fim_sugerida = data_fim_sugerida.strftime('%Y-%m-%d') %}
+
+  <form method="get" class="filtros">
+    <label>
+      Data Inicial:
+      <input type="date" name="data_inicio" value="{{ request.args.get('data_inicio', data_inicio_sugerida) }}" required>
+    </label>
+    <label>
+      Data Final:
+      <input type="date" name="data_fim" value="{{ request.args.get('data_fim', data_fim_sugerida) }}" required>
+    </label>
+    <button type="submit">Filtrar</button>
+  </form>
+  <div style="margin-top: 10px;">
+  <a href="#" id="btnPdf" class="btn btn-danger">Exportar PDF</a>
+  <a href="#" id="btnExcel" class="btn btn-success">Exportar Excel</a>
+  </div>
+
+  {% if relatorio|length == 0 %}
+    <p>Nenhuma despesa encontrada no período selecionado.</p>
+  {% else %}
+    {% set ns = namespace(total_geral=0) %}
+    {% for projeto in relatorio %}
+      <div class="colaborador-bloco">
+        <h2>Projeto: {{ projeto.projeto or 'Não informado' }}</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Descrição</th>
+              <th>Valor</th>
+              <th>Observação</th>
+              <th>Colaborador</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in projeto.despesas %}
+              <tr>
+                <td>{{ d['data_pagamento'].strftime('%d/%m/%Y') }}</td>
+                <td>{{ d['descricao'] }}</td>
+                <td>{{ d['valor']|brl }}</td>
+                <td>{{ d['observacao'] or '' }}</td>
+                <td>{{ d['nome_colaborador'] }}</td>
+              </tr>
+            {% endfor %}
+            <tr class="total-colab">
+              <td colspan="2"><strong>Total do projeto:</strong></td>
+              <td colspan="3"><strong>{{ (projeto.total or 0)|brl }}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        {% set ns.total_geral = ns.total_geral + (projeto.total or 0) %}
+      </div>
+    {% endfor %}
+
+    <div class="total-geral">
+      <strong>Total Geral: {{ ns.total_geral|brl }}</strong>
+    </div>
+  {% endif %}
+  <script>
+  document.getElementById("btnPdf").onclick = function (e) {
+    e.preventDefault();
+    const inicio = document.querySelector("input[name='data_inicio']").value;
+    const fim = document.querySelector("input[name='data_fim']").value;
+    window.location.href = `/exportar_pdf_projeto?data_inicio=${inicio}&data_fim=${fim}`;
+  };
+
+  document.getElementById("btnExcel").onclick = function (e) {
+    e.preventDefault();
+    const inicio = document.querySelector("input[name='data_inicio']").value;
+    const fim = document.querySelector("input[name='data_fim']").value;
+    window.location.href = `/exportar_excel_projeto?data_inicio=${inicio}&data_fim=${fim}`;
+  };
+</script>
+</body>
+</html>

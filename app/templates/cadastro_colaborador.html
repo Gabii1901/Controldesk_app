@@ -1,0 +1,89 @@
+<!DOCTYPE html> 
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Colaborador - ControlDesk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/cadastro_colaboradores.css') }}">
+    <style>
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+            align-items: flex-start;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            transform: scale(1.1);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Botão Voltar -->
+        <a href="{{ url_for('colaborador_bp.listar_colaboradores') }}" class="btn-voltar">⮌ Voltar</a>
+
+        <!-- Título -->
+        <h1 class="title">ControlDesk</h1>
+        <button class="btn-colaboradores">Colaboradores</button>
+
+        <!-- Formulário de Cadastro -->
+        <form action="{{ url_for('colaborador_bp.criar_colaborador') }}" method="POST">
+            <div class="form-group">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cpf">CPF:</label>
+                <input type="text" id="cpf" name="cpf" placeholder="XXX.XXX.XXX-XX" required>
+            </div>
+
+            <div class="form-group">
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" name="senha" required>
+            </div>
+
+            <div class="form-group">
+                <label for="numero_cartao">Número do Cartão:</label>
+                <input type="text" id="numero_cartao" name="numero_cartao" placeholder="4 dígitos" required>
+            </div>
+
+            <!-- Seleção de Empresa -->
+            <div class="form-group">
+                <label for="empresa">Empresa:</label>
+                <select id="empresa" name="empresa_id" required>
+                    <option value="">Selecione uma Empresa</option>
+                    {% for empresa in empresas %}
+                        <option value="{{ empresa.id }}">{{ empresa.razao_social }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Seleção de Projetos com Checkboxes -->
+            <div class="form-group">
+                <label for="projetos">Projetos:</label>
+                <div class="checkbox-group">
+                    {% for projeto in projetos %}
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="projeto_{{ projeto.id }}" name="projetos" value="{{ projeto.id }}">
+                            <label for="projeto_{{ projeto.id }}">{{ projeto.nome }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Botão de Salvar -->
+            <button type="submit" class="btn-salvar">Salvar</button>
+        </form>
+    </div>
+</body>
+</html>
