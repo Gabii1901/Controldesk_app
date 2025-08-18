@@ -1,0 +1,51 @@
+.voltar {
+  display: block;
+  text-align: left;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #000;
+  text-decoration: none;
+}
+
+.relatorio-container {
+  max-width: 700px;
+  margin: 30px auto;
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.subtitulo {
+  background-color: #ffa64d;
+  color: white;
+  font-weight: bold;
+  display: inline-block;
+  padding: 6px 20px;
+  border-radius: 20px;
+  margin: 10px 0 30px 0;
+  font-size: 1.2em;
+}
+
+.botoes-relatorios {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.botao-verde {
+  display: block;
+  background-color: #7dff8d;
+  color: #000;
+  padding: 12px 20px;
+  text-decoration: none;
+  border-radius: 10px;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: background 0.2s ease;
+  width: fit-content;
+}
+
+.botao-verde:hover {
+  background-color: #65e375;
+}

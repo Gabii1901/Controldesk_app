@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Usuário - ControlDesk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/editar_usuario.css') }}">
+</head>
+<body>
+    <header>
+        <h1 class="title">Editar Usuário</h1>
+        <a href="{{ url_for('user_bp.listar_usuarios_page') }}" class="btn-voltar">⮌ Voltar</a>
+    </header>
+
+    <div class="form-container">
+        <form method="POST">
+            <label for="nome">Nome:</label>
+            <input type="text" name="nome" id="nome" value="{{ usuario.nome }}" required>
+
+            <label for="cpf">CPF:</label>
+            <input type="text" name="cpf" id="cpf" value="{{ usuario.cpf }}" required>
+
+            <label for="senha">Nova Senha:</label>
+            <input type="password" name="senha" id="senha" placeholder="Deixe em branco para não alterar">
+
+            <button type="submit" class="btn-salvar">Salvar Alterações</button>
+        </form>
+    </div>
+</body>
+</html>

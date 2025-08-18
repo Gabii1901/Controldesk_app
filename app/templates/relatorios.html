@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/listar_relatorios.css') }}">
+{% endblock %}
+
+{% block title %}Relatórios{% endblock %}
+
+{% block content %}
+<div class="relatorio-container">
+  <a href="{{ url_for('dashboard_bp.dashboard') }}" class="voltar">&larr; Voltar</a>
+  
+  <h1 class="titulo">Controldesk</h1>
+  <div class="subtitulo">Relatórios</div>
+
+  <div class="botoes-relatorios">
+    <a href="{{ url_for('relatorio_bp.relatorio_colaborador') }}?data_inicio=2025-07-01&data_fim=2025-07-09" class="botao-verde">
+      🖊️ Gastos mensais por colaborador
+    </a>
+    <a href="{{ url_for('relatorio_bp.relatorio_cartoes') }}?data_inicio=2025-07-01&data_fim=2025-07-09" class="botao-verde">
+      💳 Gastos mensais por cartão
+    </a>
+    <a href="{{ url_for('relatorio_bp.relatorio_projetos') }}?data_inicio=2025-07-01&data_fim=2025-07-09" class="botao-verde">
+      📁 Gastos mensais por projeto
+    </a>
+    <a href="{{ url_for('relatorio_bp.relatorio_empresa') }}?data_inicio=2025-07-01&data_fim=2025-07-09" class="botao-verde">
+      🏢 Gastos mensais por empresa
+    </a>
+  </div>
+</div>
+{% endblock %}

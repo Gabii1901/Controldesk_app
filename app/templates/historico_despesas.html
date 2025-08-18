@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Histórico de Despesas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fdfdfd;
+            margin: 0;
+            padding: 0;
+        }
+        .header-orange {
+            background-color: orange;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .container {
+            margin: 30px auto;
+            max-width: 900px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: orange;
+            color: white;
+        }
+        .botao-laranja {
+            background-color: orange;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+        .botao-laranja:hover {
+            background-color: darkorange;
+        }
+        .button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-orange">
+        ControlDesk - Histórico de Despesas
+    </div>
+
+    <div class="container">
+        <h2>Minhas Despesas</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Cidade</th>
+                    <th>Local</th>
+                    <th>Descrição</th>
+                    <th>Valor (R$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for despesa in despesas %}
+                <tr>
+                    <td>{{ despesa.data_registro.strftime('%d/%m/%Y') if despesa.data_registro else 'N/A' }}</td>
+                    <td>{{ despesa.cidade }}</td>
+                    <td>{{ despesa.local }}</td>
+                    <td>{{ despesa.descricao }}</td>
+                    <td>{{ "%.2f"|format(despesa.valor) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="button-container">
+            <a href="{{ url_for('despesa_bp.menu_despesas') }}" class="botao-laranja">Voltar</a>
+        </div>
+    </div>
+
+</body>
+</html>

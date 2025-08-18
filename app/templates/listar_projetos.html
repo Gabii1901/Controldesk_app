@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projetos - ControlDesk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/listar_projetos.css') }}">
+</head>
+<body>
+    <header>
+        <h1 class="title">ControlDesk</h1>
+        <a href="{{ url_for('dashboard_bp.dashboard') }}" class="btn-voltar">⮌ Voltar</a>
+    </header>
+
+    <button class="btn-projetos">Projetos</button>
+
+    <div class="lista-projetos">
+        {% for projeto in projetos %}
+            <div class="projeto-card">
+                <span>📂 {{ projeto.nome }}</span>
+                <a href="{{ url_for('projeto_bp.editar_projeto', id=projeto.id) }}" class="edit-btn">✏️</a>
+            </div>
+        {% endfor %}
+
+        <div class="projeto-card cadastro">
+            <a href="{{ url_for('projeto_bp.cadastro_projeto_page') }}" class="add-btn">➕ Cadastrar novo Projeto</a>
+        </div>
+    </div>
+</body>
+</html>

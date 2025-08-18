@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ControlDesk - Despesas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/despesas.css') }}">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">ControlDesk - Despesas</h1>
+        <p class="welcome-text">Cadastre suas despesas abaixo:</p>
+
+        <form action="{{ url_for('despesa_bp.cadastro_despesa') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="nome_colaborador">Nome do Colaborador:</label>
+                <input type="text" name="nome_colaborador" class="form-control" value="{{ colaborador.nome }}" readonly>
+            </div>
+
+            <div class="form-group">
+                <label><strong>Projeto em que está trabalhando:</strong></label><br>
+                {% for projeto in colaborador.projetos %}
+                    <label class="radio-option">
+                        {{ projeto.nome }}
+                        <input type="radio" name="projeto_id" value="{{ projeto.id }}" required>
+                    </label>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="cidade">Cidade:</label>
+                <input type="text" id="cidade" name="cidade" required>
+            </div>
+
+            <div class="form-group">
+                <label for="local">Local:</label>
+                <input type="text" id="local" name="local" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cnpj_cpf_local">CNPJ do Local:</label>
+                <input type="text" id="cnpj_cpf_local" name="cnpj_cpf_local">
+            </div>
+
+            <div class="form-group">
+                <label for="numero_documento">Número do Documento:</label>
+                <input type="text" id="numero_documento" name="numero_documento">
+            </div>
+
+            <div class="form-group">
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" name="descricao" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="valor">Valor:</label>
+                <input type="number" step="0.01" id="valor" name="valor" required>
+            </div>
+
+            <div class="form-group">
+                <label for="observacao">Observação:</label>
+                <textarea id="observacao" name="observacao"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="complemento">Complemento:</label>
+                <textarea id="complemento" name="complemento"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="imagem">Foto do Comprovante:</label>
+                <input type="file" id="imagem" name="imagem" accept="image/*">
+            </div>
+
+            <button type="submit" class="btn">Salvar Despesa</button>
+        </form>
+    </div>
+</body>
+</html>

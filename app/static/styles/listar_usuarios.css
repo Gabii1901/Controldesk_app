@@ -1,0 +1,87 @@
+/* Estilos gerais */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8;
+    text-align: center;
+}
+
+/* Cabeçalho */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.btn-voltar {
+    background-color: red;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+/* Botão Usuários */
+.btn-usuario {
+    background-color: orange;
+    color: white;
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    margin: 20px 0;
+}
+
+/* Lista de usuários */
+.lista-usuario {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+/* Cartão de usuário */
+.usuario-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #a7f3a7;
+    padding: 15px;
+    border-radius: 10px;
+    width: 50%;
+    margin-bottom: 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.usuario-card span {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: left;
+}
+
+/* Botão de edição */
+.edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: black;
+    text-decoration: none;
+}
+
+/* Botão de cadastro */
+.cadastro {
+    background-color: #c8ffb8;
+}
+
+.add-btn {
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    color: black;
+}

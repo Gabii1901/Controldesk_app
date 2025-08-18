@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Empresas - ControlDesk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/cadastrar_empresas.css') }}">
+</head>
+<body>
+    <header>
+        <h1 class="title">ControlDesk</h1>
+        <a href="{{ url_for('empresa_bp.listar_empresas') }}" class="btn-voltar">⮌ Voltar</a>
+    </header>
+
+    <button class="btn-empresas">Empresas</button>
+
+    <div class="form-container">
+        <h2 class="form-title">📄 Cadastro de Empresas</h2>
+
+        <form action="{{ url_for('empresa_bp.cadastro_empresa') }}" method="POST">
+            <label for="razao_social">Nome/Razão Social:</label>
+            <input type="text" id="razao_social" name="razao_social" placeholder="Nome/Razão Social" required>
+
+            <label for="cnpj">CNPJ:</label>
+            <input type="text" id="cnpj" name="cnpj" placeholder="CNPJ da Empresa" required>
+
+            <label for="endereco">Endereço:</label>
+            <input type="text" id="endereco" name="endereco" placeholder="Digite o endereço completo" required>
+
+            <div class="button-group">
+                <button type="submit" class="btn-salvar">💾 Salvar</button>
+                <a href="{{ url_for('empresa_bp.listar_empresas') }}" class="btn-cancelar">❌ Cancelar</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

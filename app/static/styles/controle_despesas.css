@@ -1,0 +1,90 @@
+/* Estilos gerais */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+/* Cabeçalho */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.btn-voltar {
+    background-color: red;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+/* Título de seção */
+.subtitulo {
+    font-size: 18px;
+    margin: 10px 0 20px;
+}
+
+/* Lista de despesas */
+.lista-despesas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+/* Cartão de despesa */
+.despesa-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #a7f3a7;
+    padding: 15px;
+    border-radius: 10px;
+    width: 60%;
+    margin-bottom: 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.despesa-info {
+    text-align: left;
+}
+
+.despesa-info p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+/* Botões de ação */
+.acao-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.visualizar-btn,
+.excluir-btn {
+    border: none;
+    border-radius: 5px;
+    padding: 6px 12px;
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.visualizar-btn {
+    background-color: #007bff;
+}
+
+.excluir-btn {
+    background-color: #dc3545;
+}
