@@ -1,54 +1,165 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    text-align: center;
+/* ===== BASE CONTROL DESK ===== */
+* { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+
+:root { --topbar-h: 76px; }
+
+/* ===== BODY ===== */
+.cd-body {
+  margin: 0;
+  background-color: #cfeee2;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
 
-.container {
-    max-width: 500px;
-    margin: 50px auto;
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+/* marca d’água */
+.cd-body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/static/Imagens/logosemfundo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 480px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+}
+.cd-body > * { position: relative; z-index: 1; }
+
+/* ===== HEADER ===== */
+.top-bar {
+  width: 100%;
+  height: var(--topbar-h);
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #5e4f34;
+  color: #fff;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.12);
 }
 
-h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    font-weight: bold;
-    color: #333;
+.cd-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+/* ===== WRAP ===== */
+.cd-wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: calc(var(--topbar-h) + 40px) 16px 48px;
+}
+
+/* título da página */
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 28px;
+  color: #1f1f1f;
+}
+
+/* ===== CARD FORM ===== */
+.card-form {
+  max-width: 520px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 28px 30px;
+  border-radius: 22px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.12);
 }
 
 form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+  display: grid;
+  gap: 16px;
 }
 
-input[type="text"],
-input[type="password"] {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%;
-    box-sizing: border-box;
+/* ===== CAMPOS ===== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-button[type="submit"] {
-    background-color: green;
-    color: white;
-    padding: 12px;
-    font-size: 16px;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.form-group label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2b2b2b;
 }
 
-button[type="submit"]:hover {
-    background-color: darkgreen;
+input {
+  padding: 12px 14px;
+  font-size: 15px;
+  border-radius: 12px;
+  border: 1px solid #cfcfcf;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus {
+  border-color: #2fa36b;
+  box-shadow: 0 0 0 3px rgba(47, 163, 107, 0.20);
+}
+
+/* ===== AÇÕES ===== */
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.btn-primary {
+  background-color: #2fa36b;
+  color: #fff;
+  border: none;
+  padding: 12px 32px;
+  font-size: 15px;
+  font-weight: 800;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #238557;
+  transform: scale(1.04);
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 480px) {
+  :root { --topbar-h: 70px; }
+
+  .cd-body::before {
+    background-size: 360px;
+    opacity: 0.08;
+  }
+
+  .card-form {
+    padding: 22px 18px;
+  }
+}
+
+.btn-secondary {
+  background-color: #b64b4b;
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 26px;
+  font-size: 15px;
+  font-weight: 800;
+  border-radius: 14px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #943737;
+  transform: scale(1.04);
 }

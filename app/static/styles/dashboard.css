@@ -1,92 +1,133 @@
-/* Estilo Global */
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
 body {
-    background-color: #ffffff;
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
+  margin: 0;
+  background-color: #cfeee2; /* verdinho claro */
+  min-height: 100vh;
+  position: relative;
 }
 
-/* Estilo do Header */
-header {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 40px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background-color: #ffffff;
-    z-index: 100;
+/* ===== Marca d’água (logo no fundo) ===== */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/static/Imagens/logosemfundo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 520px;
+  opacity: 0.20;            /* bem sutil */
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Título */
+/* garante tudo por cima */
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== Top bar ===== */
+.top-bar {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #5e4f34;
+  color: #fff;
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+}
+
 .title {
-    font-size: 28px;
-    font-weight: bold;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
 }
 
-/* Botão Sair - Alinhado no canto superior direito */
+/* ===== Botão sair (ícone grande) ===== */
 .logout-container {
-    position: fixed;
-    top: 15px;
-    right: 20px;
-    z-index: 101;
+  display: flex;
+  align-items: center;
 }
 
 .sair-btn {
-    background-color: red;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: background-color 0.3s ease;
-    border: none;
-    cursor: pointer;
-}
-
-.sair-btn i {
-    font-size: 18px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 28px; /* maior */
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 10px;
+  transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
 }
 
 .sair-btn:hover {
-    background-color: darkred;
+  transform: scale(1.12);
+  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.12);
 }
 
-/* Estilo do Menu */
+/* ===== Container central ===== */
 .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 120px; /* Evita sobreposição com o header */
-    gap: 20px;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 110px 16px 40px; /* desce por causa do header fixo */
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
 }
 
-/* Botões do Menu */
+/* ===== Botões (estilo app) ===== */
 .menu-btn {
-    background-color: #ffa500;
-    color: white;
-    border: none;
-    padding: 15px 40px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    width: 250px;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
+  width: min(520px, 92vw);
+  background: #ffffff;
+  color: #1f1f1f;
+  border-radius: 28px;
+  padding: 16px 20px;
+  text-decoration: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .menu-btn:hover {
-    background-color: #ff8500;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.menu-btn .icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(47, 163, 107, 0.12);
+  color: #2fa36b;
+  font-size: 18px;
+}
+
+/* ===== Responsivo ===== */
+@media (max-width: 480px) {
+  body::before {
+    background-size: 380px;
+    opacity: 0.02;
+  }
+  .title {
+    font-size: 16px;
+  }
+  .sair-btn {
+    font-size: 26px;
+  }
 }

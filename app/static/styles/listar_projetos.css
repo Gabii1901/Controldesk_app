@@ -1,80 +1,170 @@
-/* Reset de estilos */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f8f8;
-    margin: 0;
-    text-align: center;
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-/* Cabeçalho */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 30px;
+/* ===== Ajuste de altura do header ===== */
+:root {
+  --topbar-h: 76px;
 }
 
-.title {
-    font-size: 32px;
-    font-weight: bold;
+html {
+  scroll-padding-top: calc(var(--topbar-h) + 16px);
 }
 
-/* Botão Voltar */
+/* ===== BODY + FUNDO ===== */
+.cd-body {
+  margin: 0;
+  background-color: #cfeee2;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Marca d’água */
+.cd-body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/static/Imagens/logosemfundo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 480px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cd-body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== HEADER ===== */
+.top-bar {
+  width: 100%;
+  height: var(--topbar-h);
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #5e4f34;
+  color: #fff;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+}
+
+.cd-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+/* Botão voltar */
 .btn-voltar {
-    background-color: red;
-    color: white;
-    text-decoration: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    font-size: 14px;
+  color: #fff;
+  font-size: 22px;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 10px;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
-/* Botão Projetos */
-.btn-projetos {
-    background-color: orange;
-    color: white;
-    font-weight: bold;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: default;
-    margin: 20px 0;
+.btn-voltar:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.1);
 }
 
-/* Lista de Projetos */
+/* ===== WRAP ===== */
+.cd-wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: calc(var(--topbar-h) + 40px) 16px 48px;
+}
+
+/* Título da página */
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #1f1f1f;
+}
+
+/* ===== LISTA ===== */
 .lista-projetos {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 12px;
 }
 
-/* Estilo de cada item da lista */
+/* Card projeto */
 .projeto-card {
-    background-color: #90ee90;
-    padding: 15px;
-    width: 400px;
-    margin: 10px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: #1f1f1f;
 }
 
-/* Botão de edição */
+/* quando o card for <a> */
+a.projeto-card {
+  text-decoration: none !important;
+  color: #1f1f1f !important;
+}
+
+.projeto-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+/* Info */
+.projeto-info strong {
+  font-size: 16px;
+}
+
+/* Botão editar */
 .edit-btn {
-    text-decoration: none;
-    font-size: 18px;
+  font-size: 18px;
+  color: #2fa36b;
+  text-decoration: none;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
-/* Botão Adicionar Projeto */
-.cadastro {
-    background-color: #c8ffb2;
-    font-weight: bold;
+.edit-btn:hover {
+  background: rgba(47, 163, 107, 0.15);
+  transform: scale(1.1);
 }
 
-.add-btn {
-    text-decoration: none;
-    font-weight: bold;
-    color: black;
+/* Card cadastro */
+.projeto-card.cadastro {
+  justify-content: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #2fa36b;
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 480px) {
+  :root { --topbar-h: 70px; }
+
+  .cd-body::before {
+    background-size: 360px;
+    opacity: 0.02;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
 }

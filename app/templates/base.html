@@ -45,6 +45,9 @@
     </style>
 </head>
 <body>
+
+    {# 🔧 Agora a barra está dentro de um bloco #}
+    {% block navbar %}
     <div class="nav">
         <a href="/dashboard">Home</a>
         <a href="/cadastro_usuario">Usuários</a>
@@ -54,8 +57,12 @@
         <a href="/cadastro_despesa">Despesas</a>
         <a href="/relatorios">Relatórios</a>
     </div>
+    {% endblock %}
+
     <div class="container">
         {% block content %}{% endblock %}
     </div>
+
 </body>
 </html>
+

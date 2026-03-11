@@ -1,71 +1,182 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f8f8;
-    text-align: center;
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
+/* ===== Ajuste de altura do header (evita cortar a lista) ===== */
+:root{
+  --topbar-h: 76px; /* se quiser mais alto, use 80px */
+}
+
+html{
+  scroll-padding-top: calc(var(--topbar-h) + 16px);
+}
+
+/* ===== BODY + FUNDO ===== */
+body {
+  margin: 0;
+  background-color: #cfeee2;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden; /* evita cortes laterais */
+}
+
+/* Marca d’água */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/static/Imagens/logosemfundo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 480px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== HEADER ===== */
+.top-bar {
+  width: 100%;
+  height: var(--topbar-h);
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #5e4f34;
+  color: #fff;
+  padding: 0 22px;              /* centraliza verticalmente usando height */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
 }
 
 .title {
-    font-size: 28px;
-    font-weight: bold;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
 }
 
+/* Botão voltar */
 .btn-voltar {
-    background-color: red;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 16px;
+  color: #fff;
+  font-size: 22px;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 10px;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.btn-empresas {
-    background-color: orange;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    font-size: 18px;
-    border-radius: 10px;
-    margin: 20px;
+.btn-voltar:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.1);
 }
 
+/* ===== CONTAINER ===== */
+.cd-wrap {
+  max-width: 920px; /* melhor no desktop */
+  margin: 0 auto;
+  padding: calc(var(--topbar-h) + 24px) 16px 40px; /* ✅ evita cortar a listagem */
+}
+
+/* Título da página */
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 28px;
+  color: #1f1f1f;
+}
+
+/* ===== LISTA ===== */
 .lista-empresas {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
+/* Card empresa */
 .empresa-card {
-    background-color: #90ee90;
-    padding: 15px;
-    width: 400px;
-    margin: 10px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+  color: #1f1f1f;
 }
 
+/* quando o card for <a> (cadastrar), evita azul/sublinhado do navegador */
+a.empresa-card {
+  text-decoration: none !important;
+  color: #1f1f1f !important;
+}
+
+.empresa-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+/* Info empresa */
+.empresa-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.empresa-info strong {
+  font-size: 16px;
+}
+
+.empresa-info span {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Botão editar */
 .edit-btn {
-    text-decoration: none;
+  font-size: 18px;
+  color: #2fa36b;
+  text-decoration: none;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.edit-btn:hover {
+  background: rgba(47, 163, 107, 0.15);
+  transform: scale(1.1);
+}
+
+/* Card cadastro */
+.empresa-card.cadastro {
+  justify-content: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #2fa36b;
+  background: #ffffff;
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 480px) {
+  :root{ --topbar-h: 70px; }
+
+  body::before {
+    background-size: 360px;
+    opacity: 0.02;
+  }
+
+  .page-title {
     font-size: 20px;
-    color: black;
-}
-
-.cadastro {
-    background-color: #c0ffc0;
-}
-
-.add-btn {
-    text-decoration: none;
-    font-size: 18px;
-    font-weight: bold;
-    color: black;
+  }
 }

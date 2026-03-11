@@ -1,29 +1,110 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Comprovantes Enviados</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/ver_comprovantes.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comprovantes Enviados - ControlDesk</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/ver_comprovantes.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-<body>
-    <div class="container-comprovantes">
-        <h1>Comprovantes Enviados</h1>
-        <a href="{{ url_for('dashboard_bp.dashboard') }}" class="voltar">← Voltar</a>
 
+<body class="cd-body">
+
+  <!-- HEADER -->
+  <header class="top-bar">
+    <h1 class="cd-title">CONTROLDESK</h1>
+
+    <a href="{{ url_for('dashboard_bp.dashboard') }}" class="btn-voltar" title="Voltar">
+      <i class="fa-solid fa-arrow-left"></i>
+    </a>
+  </header>
+
+  <!-- CONTEÚDO -->
+  <div class="cd-wrap">
+
+    <div class="page-title">Comprovantes Enviados</div>
+
+    {% if imagens and imagens|length > 0 %}
+
+      <div class="lista-comprovantes">
         {% for imagem in imagens %}
-            <div class="comprovante-card">
-                <img src="{{ url_for('despesa_bp.imagem_blob', id=imagem.id) }}" alt="Comprovante">
+          <div class="comprovante-card">
 
-                <div class="comprovante-info">
-                    <p><strong>Colaborador:</strong> {{ imagem.despesa.nome_colaborador }}</p>
-                    <p><strong>Despesa nº:</strong> {{ imagem.despesa.id }}</p>
-                    <p><strong>Enviado em:</strong> {{ imagem.data_upload.strftime('%d/%m/%Y %H:%M') }}</p>
-                    <a href="{{ url_for('despesa_bp.download_imagem', id=imagem.id) }}" class="btn-download">
-                        ⬇️ Baixar Comprovante
-                    </a>
-                </div>
+            <img
+              src="{{ url_for('despesa_bp.imagem_blob', id=imagem.id) }}"
+              alt="Comprovante da despesa"
+              loading="lazy"
+              decoding="async"
+              referrerpolicy="no-referrer"
+            >
+
+            <div class="comprovante-info">
+              <p><strong>Colaborador:</strong> {{ imagem.despesa.nome_colaborador }}</p>
+              <p><strong>Despesa nº:</strong> {{ imagem.despesa.id }}</p>
+              <p>
+                <strong>Enviado em:</strong>
+                {{ imagem.data_upload.strftime('%d/%m/%Y %H:%M') }}
+              </p>
+
+              <a
+                href="{{ url_for('despesa_bp.download_imagem', id=imagem.id) }}"
+                class="btn-download">
+                <i class="fa-solid fa-download"></i>
+                Baixar comprovante
+              </a>
             </div>
+
+          </div>
         {% endfor %}
-    </div>
+      </div>
+
+      {# ✅ PAGINAÇÃO (só aparece se você passou "pag" no render_template) #}
+      {% if pag is defined %}
+        <div class="paginacao" style="display:flex;justify-content:center;align-items:center;gap:10px;margin-top:18px;flex-wrap:wrap;">
+          
+          {% if pag.has_prev %}
+            <a class="btn-download"
+               href="{{ url_for('despesa_bp.ver_comprovantes', page=pag.prev_num, per=pag.per_page) }}"
+               style="text-decoration:none;">
+              <i class="fa-solid fa-chevron-left"></i>
+              Anterior
+            </a>
+          {% else %}
+            <span class="btn-download" style="opacity:.45;cursor:not-allowed;pointer-events:none;">
+              <i class="fa-solid fa-chevron-left"></i>
+              Anterior
+            </span>
+          {% endif %}
+
+          <span style="font-weight:600;">
+            Página {{ pag.page }} de {{ pag.pages if pag.pages else 1 }}
+          </span>
+
+          {% if pag.has_next %}
+            <a class="btn-download"
+               href="{{ url_for('despesa_bp.ver_comprovantes', page=pag.next_num, per=pag.per_page) }}"
+               style="text-decoration:none;">
+              Próxima
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          {% else %}
+            <span class="btn-download" style="opacity:.45;cursor:not-allowed;pointer-events:none;">
+              Próxima
+              <i class="fa-solid fa-chevron-right"></i>
+            </span>
+          {% endif %}
+
+        </div>
+      {% endif %}
+
+    {% else %}
+      <div style="padding:16px;border:1px dashed #ccc;border-radius:10px;text-align:center;">
+        Nenhum comprovante encontrado.
+      </div>
+    {% endif %}
+
+  </div>
+
 </body>
 </html>

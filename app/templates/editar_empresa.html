@@ -1,28 +1,55 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Empresa - ControlDesk</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/editar_empresa.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar Empresa - ControlDesk</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/editar_empresa.css') }}?v=3">
 </head>
-<body>
-    <header>
-        <h1 class="title">Editar Empresa</h1>
-        <a href="{{ url_for('empresa_bp.listar_empresas') }}" class="btn-voltar">⮌ Voltar</a>
-    </header>
 
-    <form action="{{ url_for('empresa_bp.editar_empresa', id=empresa.id) }}" method="POST" class="form-container">
-        <label for="razao_social">Razão Social:</label>
-        <input type="text" id="razao_social" name="razao_social" value="{{ empresa.razao_social }}" required>
+<body class="cd-body">
 
-        <label for="cnpj">CNPJ:</label>
-        <input type="text" id="cnpj" name="cnpj" value="{{ empresa.cnpj }}" required>
+  <header class="top-bar">
+    <h1 class="cd-title">ControlDesk</h1>
+    <a href="{{ url_for('empresa_bp.listar_empresas') }}" class="btn-voltar" title="Voltar">⮌</a>
+  </header>
 
-        <label for="endereco">Endereço:</label>
-        <input type="text" id="endereco" name="endereco" value="{{ empresa.endereco }}" required>
+  <main class="cd-wrap">
+    <h2 class="page-title">Editar Empresa</h2>
 
-        <button type="submit" class="btn-salvar">💾 Salvar Alterações</button>
-    </form>
+    <div class="card-form">
+
+      <div class="entity-pill">
+        <span class="pill-title">{{ empresa.razao_social }}</span>
+        <span class="pill-sub">CNPJ: {{ empresa.cnpj }}</span>
+      </div>
+
+      <form action="{{ url_for('empresa_bp.editar_empresa', id=empresa.id) }}" method="POST">
+
+        <div class="form-group">
+          <label for="razao_social">Razão Social</label>
+          <input type="text" id="razao_social" name="razao_social" value="{{ empresa.razao_social }}" required>
+        </div>
+
+        <div class="form-group">
+          <label for="cnpj">CNPJ</label>
+          <input type="text" id="cnpj" name="cnpj" value="{{ empresa.cnpj }}" required>
+        </div>
+
+        <div class="form-group">
+          <label for="endereco">Endereço</label>
+          <input type="text" id="endereco" name="endereco" value="{{ empresa.endereco }}" required>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary">💾 Salvar Alterações</button>
+          <a href="{{ url_for('empresa_bp.listar_empresas') }}" class="btn-secondary">❌ Cancelar</a>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
 </body>
 </html>

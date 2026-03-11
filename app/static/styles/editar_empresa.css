@@ -1,54 +1,162 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f8f8;
-    text-align: center;
+* { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+:root { --topbar-h: 76px; }
+
+.cd-body{
+  margin:0;
+  background-color:#cfeee2;
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
+.cd-body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background-image:url("/static/Imagens/logosemfundo.png");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:480px;
+  opacity:.15;
+  pointer-events:none;
+  z-index:0;
+}
+.cd-body > *{ position:relative; z-index:1; }
+
+.top-bar{
+  width:100%;
+  height:var(--topbar-h);
+  position:fixed;
+  top:0; left:0;
+  background:#5e4f34;
+  color:#fff;
+  padding:0 22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  z-index:10;
+  box-shadow:0 3px 12px rgba(0,0,0,0.12);
 }
 
-.title {
-    font-size: 28px;
-    font-weight: bold;
+.cd-title{
+  margin:0;
+  font-size:18px;
+  font-weight:800;
+  letter-spacing:1px;
 }
 
-.btn-voltar {
-    background-color: red;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 16px;
+.btn-voltar{
+  color:#fff;
+  font-size:22px;
+  text-decoration:none;
+  padding:6px 10px;
+  border-radius:10px;
+  transition:background .2s ease, transform .2s ease;
+}
+.btn-voltar:hover{
+  background:rgba(255,255,255,.15);
+  transform:scale(1.1);
 }
 
-.form-container {
-    background-color: white;
-    padding: 20px;
-    width: 400px;
-    margin: 20px auto;
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+.cd-wrap{
+  max-width:1000px;
+  margin:0 auto;
+  padding:calc(var(--topbar-h) + 40px) 16px 48px;
 }
 
-input {
-    width: 90%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+.page-title{
+  font-size:22px;
+  font-weight:700;
+  text-align:center;
+  margin:0 0 28px;
+  color:#1f1f1f;
 }
 
-.btn-salvar {
-    background-color: green;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    font-size: 18px;
-    border-radius: 10px;
-    margin-top: 15px;
+.card-form{
+  max-width:720px;
+  margin:0 auto;
+  background:#fff;
+  padding:28px 30px;
+  border-radius:22px;
+  box-shadow:0 3px 12px rgba(0,0,0,0.12);
+}
+
+/* pill com dados atuais */
+.entity-pill{
+  background:rgba(47,163,107,0.10);
+  border:1px solid rgba(47,163,107,0.20);
+  border-radius:16px;
+  padding:12px 14px;
+  margin-bottom:18px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.pill-title{ font-weight:900; color:#1f1f1f; }
+.pill-sub{ font-size:13px; color:#444; }
+
+form{ display:grid; gap:16px; }
+
+.form-group{ display:flex; flex-direction:column; gap:6px; }
+
+.form-group label{
+  font-size:14px;
+  font-weight:700;
+  color:#2b2b2b;
+}
+
+input{
+  padding:12px 14px;
+  font-size:15px;
+  border-radius:12px;
+  border:1px solid #cfcfcf;
+  background:#fff;
+  outline:none;
+  transition:border-color .2s ease, box-shadow .2s ease;
+}
+
+input:focus{
+  border-color:#2fa36b;
+  box-shadow:0 0 0 3px rgba(47,163,107,0.20);
+}
+
+.actions{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  margin-top:6px;
+  flex-wrap:wrap;
+}
+
+.btn-primary{
+  background:#2fa36b;
+  color:#fff;
+  border:none;
+  padding:12px 26px;
+  font-size:15px;
+  font-weight:800;
+  border-radius:14px;
+  cursor:pointer;
+  transition:background .2s ease, transform .2s ease;
+}
+.btn-primary:hover{ background:#238557; transform:scale(1.04); }
+
+.btn-secondary{
+  background:#b64b4b;
+  color:#fff;
+  text-decoration:none;
+  padding:12px 26px;
+  font-size:15px;
+  font-weight:800;
+  border-radius:14px;
+  transition:background .2s ease, transform .2s ease;
+}
+.btn-secondary:hover{ background:#943737; transform:scale(1.04); }
+
+@media (max-width:480px){
+  :root{ --topbar-h: 70px; }
+  .cd-body::before{ background-size:360px; opacity:0.08; }
+  .card-form{ padding:22px 18px; }
+  .actions{ flex-direction:column; }
 }

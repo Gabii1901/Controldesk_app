@@ -1,22 +1,46 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu de Despesas - ControlDesk</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/menu_despesas.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ControlDesk - Menu do Colaborador</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/menu_despesas.css') }}">
 </head>
 <body>
-    <header>
-        <h1 class="title">ControlDesk - Menu de Despesas</h1>
-    </header>
 
-    <div class="container">
-        <p class="welcome-text">Olá, {{ colaborador.nome }}! Escolha uma opção:</p>
+  <!-- Topo -->
+  <div class="top-bar">
+    <span class="logo">CONTROLDESK</span>
 
-        <a href="{{ url_for('despesa_bp.cadastro_despesa_page') }}" class="btn">Cadastrar Despesa</a>
-        <a href="{{ url_for('despesa_bp.historico_despesas') }}" class="btn btn-info">Histórico de Despesas</a>
-        <a href="{{ url_for('auth_bp.logout') }}" class="btn btn-logout">Sair</a>
+    <div class="top-actions">
+      <a href="{{ url_for('auth_bp.logout') }}" class="icon-btn" title="Sair">
+        ⎋
+      </a>
     </div>
+  </div>
+
+  <!-- Conteúdo -->
+  <div class="container">
+
+    <div class="welcome-card">
+      <p class="welcome-text">BEM-VINDO</p>
+      <strong>{{ colaborador.nome }}</strong>
+    </div>
+
+    <div class="menu">
+
+      <a href="{{ url_for('despesa_bp.cadastro_despesa_page') }}" class="menu-item">
+        <span class="icon">📋</span>
+        <span>Nova Despesa</span>
+      </a>
+
+      <a href="{{ url_for('despesa_bp.historico_despesas') }}" class="menu-item">
+        <span class="icon">🔄</span>
+        <span>Histórico de Despesas</span>
+      </a>
+
+    </div>
+  </div>
+
 </body>
 </html>

@@ -1,30 +1,56 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projetos - ControlDesk</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/listar_projetos.css') }}">
-</head>
-<body>
-    <header>
-        <h1 class="title">ControlDesk</h1>
-        <a href="{{ url_for('dashboard_bp.dashboard') }}" class="btn-voltar">⮌ Voltar</a>
-    </header>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projetos - ControlDesk</title>
 
-    <button class="btn-projetos">Projetos</button>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/listar_projetos.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="cd-body">
+
+  <!-- HEADER -->
+  <header class="top-bar">
+    <h1 class="cd-title">CONTROLDESK</h1>
+
+    <a href="{{ url_for('dashboard_bp.dashboard') }}" class="btn-voltar" title="Voltar">
+      <i class="fa-solid fa-arrow-left"></i>
+    </a>
+  </header>
+
+  <!-- CONTEÚDO -->
+  <div class="cd-wrap">
+
+    <div class="page-title">Projetos</div>
 
     <div class="lista-projetos">
-        {% for projeto in projetos %}
-            <div class="projeto-card">
-                <span>📂 {{ projeto.nome }}</span>
-                <a href="{{ url_for('projeto_bp.editar_projeto', id=projeto.id) }}" class="edit-btn">✏️</a>
-            </div>
-        {% endfor %}
+      {% for projeto in projetos %}
+        <div class="projeto-card">
+          <div class="projeto-info">
+            <strong>{{ projeto.nome }}</strong>
+          </div>
 
-        <div class="projeto-card cadastro">
-            <a href="{{ url_for('projeto_bp.cadastro_projeto_page') }}" class="add-btn">➕ Cadastrar novo Projeto</a>
+          <a
+            href="{{ url_for('projeto_bp.editar_projeto', id=projeto.id) }}"
+            class="edit-btn"
+            title="Editar projeto"
+          >
+            <i class="fa-solid fa-pen"></i>
+          </a>
         </div>
+      {% endfor %}
+
+      <a
+        href="{{ url_for('projeto_bp.cadastro_projeto_page') }}"
+        class="projeto-card cadastro"
+      >
+        <i class="fa-solid fa-plus"></i>
+        <span>Cadastrar novo projeto</span>
+      </a>
     </div>
+
+  </div>
+
 </body>
 </html>

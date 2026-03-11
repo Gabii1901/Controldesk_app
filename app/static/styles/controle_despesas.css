@@ -1,90 +1,175 @@
-/* Estilos gerais */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f8f8;
-    text-align: center;
-    margin: 0;
-    padding: 0;
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-/* Cabeçalho */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
+/* ===== ALTURA HEADER ===== */
+:root {
+  --topbar-h: 76px;
 }
 
-.title {
-    font-size: 24px;
-    font-weight: bold;
+html {
+  scroll-padding-top: calc(var(--topbar-h) + 16px);
 }
 
+/* ===== BODY + FUNDO ===== */
+.cd-body {
+  margin: 0;
+  background-color: #cfeee2;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Marca d’água */
+.cd-body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/static/Imagens/logosemfundo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 480px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cd-body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== HEADER ===== */
+.top-bar {
+  width: 100%;
+  height: var(--topbar-h);
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #5e4f34;
+  color: #fff;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+}
+
+.cd-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+/* Botão voltar */
 .btn-voltar {
-    background-color: red;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 5px;
-    text-decoration: none;
+  color: #fff;
+  font-size: 22px;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 10px;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
-/* Título de seção */
-.subtitulo {
-    font-size: 18px;
-    margin: 10px 0 20px;
+.btn-voltar:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.1);
 }
 
-/* Lista de despesas */
+/* ===== WRAP ===== */
+.cd-wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: calc(var(--topbar-h) + 40px) 16px 48px;
+}
+
+/* Título da página */
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #1f1f1f;
+}
+
+/* ===== LISTA ===== */
 .lista-despesas {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-/* Cartão de despesa */
+/* Card despesa */
 .despesa-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #a7f3a7;
-    padding: 15px;
-    border-radius: 10px;
-    width: 60%;
-    margin-bottom: 10px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.despesa-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+/* Info */
 .despesa-info {
-    text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.despesa-info p {
-    margin: 5px 0;
-    font-size: 14px;
+.despesa-info strong {
+  font-size: 16px;
 }
 
-/* Botões de ação */
-.acao-btns {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.despesa-info .valor {
+  font-weight: 600;
+  color: #2fa36b;
 }
 
-.visualizar-btn,
+.despesa-info .descricao {
+  font-size: 14px;
+  color: #444;
+}
+
+.despesa-info small {
+  font-size: 13px;
+  color: #777;
+}
+
+/* Botão excluir */
 .excluir-btn {
-    border: none;
-    border-radius: 5px;
-    padding: 6px 12px;
-    color: white;
-    cursor: pointer;
-    text-decoration: none;
+  font-size: 18px;
+  color: #dc3545;
+  text-decoration: none;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.visualizar-btn {
-    background-color: #007bff;
+.excluir-btn:hover {
+  background: rgba(220, 53, 69, 0.15);
+  transform: scale(1.1);
 }
 
-.excluir-btn {
-    background-color: #dc3545;
+/* ===== RESPONSIVO ===== */
+@media (max-width: 480px) {
+  :root { --topbar-h: 70px; }
+
+  .cd-body::before {
+    background-size: 360px;
+    opacity: 0.02;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
 }

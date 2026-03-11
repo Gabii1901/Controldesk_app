@@ -46,7 +46,7 @@ def cadastrar_projeto():
         db.session.add(novo_projeto)
         db.session.commit()
 
-        return redirect(url_for('dashboard_bp.dashboard'))  # ✅ Redireciona para o Dashboard
+        return redirect(url_for("projeto_bp.listar_projetos")) 
 
     except Exception as e:
         db.session.rollback()
@@ -79,7 +79,7 @@ def atualizar_projeto(id):
             projeto.empresa_id = int(data.get('empresa_id'))
 
         db.session.commit()
-        return redirect(url_for('dashboard_bp.dashboard'))  # ✅ Redireciona para o Dashboard
+        return redirect(url_for("projeto_bp.listar_projetos"))  # ✅ Redireciona para o Dashboard
 
     except Exception as e:
         db.session.rollback()

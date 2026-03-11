@@ -1,51 +1,121 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* ===== BODY + MARCA D'ÁGUA ===== */
 body {
-    background-color: #f9f9f9;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    text-align: center;
+  margin: 0;
+  background-color: #b2ff91; /* verdinho claro */
+  min-height: 100vh;
+  position: relative;
 }
 
-header {
-    background-color: #ffa500;
-    color: white;
-    padding: 20px;
+/* Marca d’água */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/static/Imagens/logosemfundo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 420px;   /* tamanho da logo */
+  opacity: 0.15;            /* intensidade */
+  pointer-events: none;
+  z-index: 0;
 }
 
-.title {
-    margin: 0;
-    font-size: 28px;
+/* Garante que todo o conteúdo fique acima */
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
+/* ===== TOPO ===== */
+.top-bar {
+  background: #b2ff91;
+  color: #000000;
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+/* Ícone do topo (sair) */
+.icon-btn {
+  color: #000000;
+  font-size: 38px;     /* ⬅ maior */
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.icon-btn:hover {
+  transform: scale(1.15);
+  opacity: 0.85;
+}
+
+/* ===== CONTAINER ===== */
 .container {
-    margin-top: 50px;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+/* ===== CARD DE BOAS-VINDAS ===== */
+.welcome-card {
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 22px;
+  text-align: center;
+  margin-bottom: 42px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
 }
 
 .welcome-text {
-    font-size: 20px;
-    margin-bottom: 30px;
+  margin: 0;
+  font-size: 13px;
+  color: #555;
 }
 
-.btn {
-    display: inline-block;
-    background-color: #ffa500;
-    color: white;
-    padding: 15px 30px;
-    margin: 10px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 18px;
-    transition: background-color 0.3s ease;
+.welcome-card strong {
+  font-size: 18px;
+  color: #2fa36b;
 }
 
-.btn:hover {
-    background-color: #ff8500;
+/* ===== MENU ===== */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.btn-logout {
-    background-color: red;
+.menu-item {
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 15px 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.btn-logout:hover {
-    background-color: darkred;
+.menu-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
+.menu-item .icon {
+  font-size: 22px;
 }

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sucesso</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/despesa_sucesso.css') }}">
+</head>
+<body class="success-body">
+
+  <div class="success-wrap">
+
+    <div class="success-icon" aria-hidden="true">
+      <!-- ícone em SVG (check dentro de círculo) -->
+      <svg viewBox="0 0 120 120" width="120" height="120">
+        <circle cx="60" cy="60" r="46" fill="none" stroke="rgba(0,0,0,.65)" stroke-width="6"/>
+        <path d="M42 62 L55 74 L80 47" fill="none" stroke="rgba(0,0,0,.65)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div class="success-pill">Sucesso!</div>
+
+    <a class="success-btn" href="{{ url_for('despesa_bp.menu_despesas') }}">
+      Volta ao menu principal
+    </a>
+
+    <!-- opcional: cadastrar outra -->
+    <a class="success-btn secondary" href="{{ url_for('despesa_bp.cadastro_despesa_page') }}">
+      Cadastrar outra despesa
+    </a>
+
+  </div>
+
+</body>
+</html>

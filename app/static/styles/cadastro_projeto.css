@@ -1,87 +1,165 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+/* ===== BASE CONTROL DESK ===== */
+* { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+:root { --topbar-h: 76px; }
+
+.cd-body {
+  margin: 0;
+  background-color: #cfeee2;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
 
-.container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    width: 400px;
-    text-align: center;
-    position: relative;
+/* marca d’água */
+.cd-body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/static/Imagens/logosemfundo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 480px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+}
+.cd-body > * { position: relative; z-index: 1; }
+
+/* header */
+.top-bar {
+  width: 100%;
+  height: var(--topbar-h);
+  position: fixed;
+  top: 0; left: 0;
+  background: #5e4f34;
+  color: #fff;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.12);
 }
 
-.title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 10px;
+.cd-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
 }
 
+/* voltar */
 .btn-voltar {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background-color: red;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 5px;
-    text-decoration: none;
+  color: #fff;
+  font-size: 22px;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 10px;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
-
 .btn-voltar:hover {
-    background-color: darkred;
+  background: rgba(255,255,255,0.15);
+  transform: scale(1.1);
 }
 
-.btn-projetos {
-    background-color: #90ee90;
-    border: none;
-    padding: 10px 20px;
-    font-size: 18px;
-    border-radius: 5px;
-    cursor: default;
-    margin-bottom: 15px;
+/* wrap */
+.cd-wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: calc(var(--topbar-h) + 40px) 16px 48px;
 }
 
-.form-group {
-    margin-bottom: 15px;
-    text-align: left;
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 28px;
+  color: #1f1f1f;
 }
 
-label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
+/* ===== CARD FORM ===== */
+.card-form {
+  max-width: 720px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 28px 30px;
+  border-radius: 22px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+}
+
+form { display: grid; gap: 16px; }
+
+/* campos */
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2b2b2b;
 }
 
 input, select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
+  padding: 12px 14px;
+  font-size: 15px;
+  border-radius: 12px;
+  border: 1px solid #cfcfcf;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.botoes {
-    margin-top: 15px;
+input:focus, select:focus {
+  border-color: #2fa36b;
+  box-shadow: 0 0 0 3px rgba(47, 163, 107, 0.20);
 }
 
-.btn-salvar {
-    background-color: green;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
+/* ações */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 6px;
+  flex-wrap: wrap;
 }
 
-.btn-salvar:hover {
-    background-color: darkgreen;
+.btn-primary {
+  background-color: #2fa36b;
+  color: #fff;
+  border: none;
+  padding: 12px 26px;
+  font-size: 15px;
+  font-weight: 800;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.btn-primary:hover {
+  background-color: #238557;
+  transform: scale(1.04);
+}
+
+.btn-secondary {
+  background-color: #b64b4b;
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 26px;
+  font-size: 15px;
+  font-weight: 800;
+  border-radius: 14px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.btn-secondary:hover {
+  background-color: #943737;
+  transform: scale(1.04);
+}
+
+/* responsivo */
+@media (max-width: 480px) {
+  :root { --topbar-h: 70px; }
+
+  .cd-body::before { background-size: 360px; opacity: 0.08; }
+
+  .card-form { padding: 22px 18px; }
+
+  .actions { flex-direction: column; }
 }

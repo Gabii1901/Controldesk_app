@@ -1,58 +1,63 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastrar Projeto - ControlDesk</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/cadastro_projeto.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastrar Projeto - ControlDesk</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/cadastro_projeto.css') }}?v=2">
 </head>
-<body>
-    <div class="container">
-        <!-- Botão Voltar -->
-        <a href="{{ url_for('projeto_bp.listar_projetos') }}" class="btn-voltar">
-            ⮌ Voltar
-        </a>
 
-        <!-- Título -->
-        <h1 class="title">ControlDesk</h1>
-        <button class="btn-projetos">Projetos</button>
+<body class="cd-body">
 
-        <!-- Formulário de Cadastro -->
-        <form action="{{ url_for('projeto_bp.cadastrar_projeto') }}" method="POST">
-            <div class="form-group">
-                <label for="nome">Nome do Projeto:</label>
-                <input type="text" id="nome" name="nome" required>
-            </div>
+  <header class="top-bar">
+    <h1 class="cd-title">ControlDesk</h1>
+    <a href="{{ url_for('projeto_bp.listar_projetos') }}" class="btn-voltar" title="Voltar">⮌</a>
+  </header>
 
-            <div class="form-group">
-                <label for="local">Local:</label>
-                <input type="text" id="local" name="local" required>
-            </div>
+  <main class="cd-wrap">
+    <h2 class="page-title">Cadastrar Projeto</h2>
 
-            <div class="form-group">
-                <label for="status">Status:</label>
-                <select id="status" name="status">
-                    <option value="EM ANDAMENTO">Em Andamento</option>
-                    <option value="CONCLUÍDO">Concluído</option>
-                    <option value="CANCELADO">Cancelado</option>
-                </select>
-            </div>
+    <div class="card-form">
+      <form action="{{ url_for('projeto_bp.cadastrar_projeto') }}" method="POST">
 
-            <div class="form-group">
-                <label for="empresa">Empresa:</label>
-                <select id="empresa" name="empresa_id" required>
-                    <option value="">Selecione uma Empresa</option>
-                    {% for empresa in empresas %}
-                        <option value="{{ empresa.id }}">{{ empresa.razao_social }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+        <div class="form-group">
+          <label for="nome">Nome do Projeto</label>
+          <input type="text" id="nome" name="nome" placeholder="Ex: Reforma da Filial X" required>
+        </div>
 
-            <!-- Botão de Salvar -->
-            <div class="botoes">
-                <button type="submit" class="btn-salvar">Salvar</button>
-            </div>
-        </form>
+        <div class="form-group">
+          <label for="local">Local</label>
+          <input type="text" id="local" name="local" placeholder="Ex: Chapecó - SC" required>
+        </div>
+
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select id="status" name="status" required>
+            <option value="EM ANDAMENTO">Em Andamento</option>
+            <option value="CONCLUÍDO">Concluído</option>
+            <option value="CANCELADO">Cancelado</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="empresa">Empresa</label>
+          <select id="empresa" name="empresa_id" required>
+            <option value="">Selecione uma Empresa</option>
+            {% for empresa in empresas %}
+              <option value="{{ empresa.id }}">{{ empresa.razao_social }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary">💾 Salvar</button>
+          <a href="{{ url_for('projeto_bp.listar_projetos') }}" class="btn-secondary">❌ Cancelar</a>
+        </div>
+
+      </form>
     </div>
+  </main>
+
 </body>
 </html>

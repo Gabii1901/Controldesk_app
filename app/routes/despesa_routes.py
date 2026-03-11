@@ -1,124 +1,323 @@
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash, Response, send_file
+from sqlalchemy.orm import defer, joinedload
+from flask import (
+    Blueprint, request, jsonify, render_template, redirect, url_for,
+    flash, Response, send_file, session
+    
+)
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from datetime import datetime
+import os
+import uuid
+import shutil
 import filetype
 from fpdf import FPDF
 import pandas as pd
 from io import BytesIO
+from sqlalchemy.exc import SQLAlchemyError
 from app import db
 from app.models import Despesa, Imagem, Colaborador, Usuario, Projeto
-from flask_login import login_required, current_user
 import pytz
 
 
 despesa_bp = Blueprint('despesa_bp', __name__)
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
+# ✅ pasta temporária para pré-confirmação (NÃO salva bytes em cookie)
+# ajuste se quiser outro lugar:
+TMP_DIR = os.path.join("app", "static", "uploads", "tmp_despesas")
+
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# 🔹 Menu principal de despesas
+
+def _is_colaborador():
+    return isinstance(current_user, Colaborador)
+
+
+def _brl(v: float) -> str:
+    try:
+        return f"R$ {v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except Exception:
+        return "R$ 0,00"
+
+
+def _ensure_tmp_dir():
+    os.makedirs(TMP_DIR, exist_ok=True)
+
+
+def _tmp_abs_path(tmp_name: str) -> str:
+    return os.path.join(TMP_DIR, tmp_name)
+
+
+def _tmp_public_url(tmp_name: str) -> str:
+    # static path
+    return url_for("static", filename=f"uploads/tmp_despesas/{tmp_name}")
+
+
+def _cleanup_tmp(tmp_name: str | None):
+    if not tmp_name:
+        return
+    try:
+        p = _tmp_abs_path(tmp_name)
+        if os.path.exists(p):
+            os.remove(p)
+    except Exception:
+        pass
+
+
 @despesa_bp.route('/menu_despesas', methods=['GET'])
 @login_required
 def menu_despesas():
-    if not isinstance(current_user, Colaborador):
+    if not _is_colaborador():
         flash("Acesso não autorizado.", "danger")
         return redirect(url_for("auth_bp.login"))
     return render_template("menu_despesas.html", colaborador=current_user)
 
-# 🔹 Página de cadastro de despesas
+
 @despesa_bp.route('/cadastro_despesa', methods=['GET'])
 @login_required
 def cadastro_despesa_page():
-    if not isinstance(current_user, Colaborador):
+    if not _is_colaborador():
         flash("Acesso não autorizado.", "danger")
         return redirect(url_for("auth_bp.login"))
     return render_template("cadastro_despesa.html", colaborador=current_user)
 
-# 🔹 Processamento do cadastro
+
+# =========================
+# ✅ PRÉ-CONFIRMAÇÃO (GET)
+# =========================
+@despesa_bp.route('/despesa_confirmar', methods=['GET'])
+@login_required
+def despesa_confirmar_page():
+    if not _is_colaborador():
+        flash("Acesso não autorizado.", "danger")
+        return redirect(url_for("auth_bp.login"))
+
+    payload = session.get("despesa_preview") or {}
+    if not payload:
+        flash("Nenhuma despesa para confirmar.", "warning")
+        return redirect(url_for("despesa_bp.cadastro_despesa_page"))
+
+    projeto_nome = None
+    if payload.get("projeto_id"):
+        p = Projeto.query.get(payload.get("projeto_id"))
+        projeto_nome = p.nome if p else None
+
+    try:
+        valor_f = float(payload.get("valor") or 0)
+    except Exception:
+        valor_f = 0.0
+
+    # ✅ URL pública para preview da imagem (vem do arquivo temporário)
+    tmp_name = payload.get("tmp_name")
+    imagem_preview_url = _tmp_public_url(tmp_name) if tmp_name else None
+
+    return render_template(
+        "despesa_confirmar.html",
+        colaborador=current_user,
+        dados=payload,
+        projeto_nome=projeto_nome,
+        valor_formatado=_brl(valor_f),
+        imagem_preview_url=imagem_preview_url,
+        imagem_nome=payload.get("imagem_nome"),
+    )
+
+
+# ==========================================
+# ✅ PRÉ-CONFIRMAÇÃO -> SALVAR DEFINITIVO (POST)
+# ==========================================
+@despesa_bp.route('/despesa_confirmar', methods=['POST'])
+@login_required
+def despesa_confirmar_salvar():
+    if not _is_colaborador():
+        flash("Acesso não autorizado.", "danger")
+        return redirect(url_for("auth_bp.login"))
+
+    payload = session.get("despesa_preview") or {}
+    if not payload:
+        flash("Nenhuma despesa para confirmar.", "warning")
+        return redirect(url_for("despesa_bp.cadastro_despesa_page"))
+
+    fuso_brasilia = pytz.timezone('America/Sao_Paulo')
+    data_registro = datetime.now(fuso_brasilia)
+
+    projeto_id = payload.get("projeto_id")
+    projeto = Projeto.query.get(projeto_id) if projeto_id else None
+    nome_projeto = projeto.nome if projeto else None
+
+    try:
+        valor_f = float(payload.get("valor"))
+    except Exception:
+        flash("Valor inválido.", "danger")
+        return redirect(url_for("despesa_bp.despesa_confirmar_page"))
+
+    # ✅ salva despesa
+    despesa = Despesa(
+        nome_colaborador=current_user.nome,
+        cidade=payload.get("cidade"),
+        local=payload.get("local"),
+        cnpj_cpf_local=payload.get("cnpj_cpf_local"),
+        numero_documento=payload.get("numero_documento"),
+        descricao=payload.get("descricao"),
+        valor=valor_f,
+        observacao=payload.get("observacao") or "",
+        complemento=payload.get("complemento"),
+        nome_empresa=current_user.empresa.razao_social if current_user.empresa else None,
+        num_cartao=current_user.numero_cartao or '',
+        nome_projeto=nome_projeto,
+        data_registro=data_registro
+    )
+
+    tmp_name = payload.get("tmp_name")
+    tmp_path = _tmp_abs_path(tmp_name) if tmp_name else None
+
+    try:
+        db.session.add(despesa)
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+        flash("Erro ao salvar a despesa. Verifique os campos e tente novamente.", "danger")
+        return redirect(url_for("despesa_bp.despesa_confirmar_page"))
+
+    # ✅ salva imagem (lê do arquivo temporário)
+    if tmp_path and os.path.exists(tmp_path):
+        try:
+            with open(tmp_path, "rb") as f:
+                raw = f.read()
+
+            # tenta inferir extensão
+            kind = filetype.guess(raw)
+            extensao = (kind.extension if kind else None) or (payload.get("imagem_ext") or "png")
+
+            nome_colab = current_user.nome.lower().replace(" ", "_")
+            timestamp = datetime.now(fuso_brasilia).strftime("%Y%m%d_%H%M%S")
+            nome_arquivo = secure_filename(f"{nome_colab}_despesa{despesa.id}_{timestamp}.{extensao}")
+
+            imagem = Imagem(
+                despesa_id=despesa.id,
+                imagem=raw,
+                nome_arquivo=nome_arquivo,
+                caminho=nome_arquivo,
+                data_upload=datetime.now(fuso_brasilia)
+            )
+            db.session.add(imagem)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            flash("Despesa salva, mas houve erro ao salvar a imagem.", "warning")
+        finally:
+            _cleanup_tmp(tmp_name)
+
+    # limpa preview da sessão (não estoura cookie)
+    session.pop("despesa_preview", None)
+
+    return redirect(url_for('despesa_bp.despesa_sucesso', despesa_id=despesa.id))
+
+
+# ✅ cancelar confirmação (opcional, mas recomendado)
+@despesa_bp.route('/despesa_confirmar/cancelar', methods=['POST'])
+@login_required
+def despesa_confirmar_cancelar():
+    if not _is_colaborador():
+        flash("Acesso não autorizado.", "danger")
+        return redirect(url_for("auth_bp.login"))
+
+    payload = session.get("despesa_preview") or {}
+    _cleanup_tmp(payload.get("tmp_name"))
+    session.pop("despesa_preview", None)
+
+    flash("Cadastro cancelado.", "info")
+    return redirect(url_for("despesa_bp.cadastro_despesa_page"))
+
+
+@despesa_bp.route('/despesa_sucesso', methods=['GET'])
+@login_required
+def despesa_sucesso():
+    if not _is_colaborador():
+        flash("Acesso não autorizado.", "danger")
+        return redirect(url_for("auth_bp.login"))
+
+    despesa_id = request.args.get('despesa_id', type=int)
+    return render_template("despesa_sucesso.html", colaborador=current_user, despesa_id=despesa_id)
+
+
+# =========================
+# ✅ CADASTRO (POST) -> VAI PRA CONFIRMAR
+# =========================
 @despesa_bp.route('/cadastro_despesa', methods=['POST'])
 @login_required
 def cadastro_despesa():
-    if not isinstance(current_user, Colaborador):
+    if not _is_colaborador():
         flash("Acesso não autorizado.", "danger")
         return redirect(url_for("auth_bp.login"))
 
     data = request.form
     arquivo = request.files.get('imagem')
 
-    # ✅ Validação de campos obrigatórios
     if (
         not data.get('cidade') or
         not data.get('local') or
         not data.get('valor') or
         not data.get('complemento') or
+        not data.get('projeto_id') or
         not arquivo
     ):
         flash("Todos os campos obrigatórios devem ser preenchidos e a imagem deve ser enviada.", "danger")
         return redirect(url_for('despesa_bp.cadastro_despesa_page'))
 
-    projeto_id = data.get('projeto_id')
-    projeto = Projeto.query.get(projeto_id) if projeto_id else None
-    nome_projeto = projeto.nome if projeto else None
+    if arquivo and not allowed_file(arquivo.filename):
+        flash("Formato de imagem inválido. Envie PNG, JPG, JPEG ou GIF.", "danger")
+        return redirect(url_for('despesa_bp.cadastro_despesa_page'))
 
-    # 📌 Data no horário de Brasília
-    fuso_brasilia = pytz.timezone('America/Sao_Paulo')
-    data_registro = datetime.now(fuso_brasilia)
+    # ✅ limpa um preview anterior se existir
+    prev = session.get("despesa_preview") or {}
+    _cleanup_tmp(prev.get("tmp_name"))
+    session.pop("despesa_preview", None)
 
-    despesa = Despesa(
-        nome_colaborador=current_user.nome,
-        cidade=data.get('cidade'),
-        local=data.get('local'),
-        cnpj_cpf_local=data.get('cnpj_cpf_local'),
-        numero_documento=data.get('numero_documento'),
-        descricao=data.get('descricao'),
-        valor=float(data.get('valor')),
-        observacao=data.get('observacao', ''),
-        complemento=data.get('complemento'),
-        nome_empresa=current_user.empresa.razao_social if current_user.empresa else None,
-        num_cartao=current_user.numero_cartao or '',
-        nome_projeto=nome_projeto,
-        data_registro=data_registro
-    )
-    db.session.add(despesa)
-    db.session.commit()
+    # ✅ salva arquivo temporário em disco (NÃO em session)
+    _ensure_tmp_dir()
 
-    if allowed_file(arquivo.filename):
-        nome_colab = current_user.nome.lower().replace(" ", "_")
-        extensao = arquivo.filename.rsplit(".", 1)[-1].lower()
+    original_name = secure_filename(arquivo.filename or "comprovante.png")
+    ext = (original_name.rsplit(".", 1)[-1].lower() if "." in original_name else "png")
+    tmp_name = f"{uuid.uuid4().hex}.{ext}"
+    tmp_path = _tmp_abs_path(tmp_name)
+    arquivo.save(tmp_path)
 
-        timestamp = datetime.now(fuso_brasilia).strftime("%Y%m%d_%H%M%S")
-        nome_arquivo = secure_filename(f"{nome_colab}_despesa{despesa.id}_{timestamp}.{extensao}")
+    payload = {
+        "cidade": (data.get("cidade") or "").strip(),
+        "local": (data.get("local") or "").strip(),
+        "cnpj_cpf_local": (data.get("cnpj_cpf_local") or "").strip(),
+        "numero_documento": (data.get("numero_documento") or "").strip(),
+        "descricao": (data.get("descricao") or "").strip(),
+        "valor": (data.get("valor") or "").strip(),
+        "observacao": (data.get("observacao") or "").strip(),
+        "complemento": (data.get("complemento") or "").strip(),
+        "projeto_id": (data.get("projeto_id") or None),
 
-        imagem = Imagem(
-            despesa_id=despesa.id,
-            imagem=arquivo.read(),
-            nome_arquivo=nome_arquivo,
-            caminho=nome_arquivo,
-            data_upload=datetime.now(fuso_brasilia)
-        )
-        db.session.add(imagem)
-        db.session.commit()
+        # somente metadados pequenos + nome do tmp
+        "tmp_name": tmp_name,
+        "imagem_nome": original_name,
+        "imagem_ext": ext,
+    }
 
-    flash("Despesa cadastrada com sucesso!", "success")
-    return redirect(url_for('despesa_bp.menu_despesas'))
+    session["despesa_preview"] = payload
+
+    return redirect(url_for("despesa_bp.despesa_confirmar_page"))
 
 
-
-
-# 🔹 Histórico de despesas
 @despesa_bp.route('/historico_despesas', methods=['GET'])
 @login_required
 def historico_despesas():
-    if not isinstance(current_user, Colaborador):
+    if not _is_colaborador():
         flash("Acesso não autorizado.", "danger")
         return redirect(url_for("auth_bp.login"))
 
     despesas = Despesa.query.filter_by(nome_colaborador=current_user.nome).order_by(Despesa.id.desc()).all()
     return render_template("historico_despesas.html", despesas=despesas, colaborador=current_user)
 
-# 🔹 Visualizar comprovantes
+
 @despesa_bp.route('/ver_comprovantes')
 @login_required
 def ver_comprovantes():
@@ -126,10 +325,23 @@ def ver_comprovantes():
         flash("Acesso restrito a administradores.", "danger")
         return redirect(url_for("auth_bp.login"))
 
-    imagens = db.session.query(Imagem).join(Despesa).order_by(Imagem.data_upload.desc()).all()
-    return render_template('ver_comprovantes.html', imagens=imagens)
+    page = request.args.get("page", 1, type=int)
+    per_page = min(request.args.get("per", 30, type=int), 60)
 
-# 🔹 Ver imagem blob
+    q = (
+        db.session.query(Imagem)
+        .options(defer(Imagem.imagem), joinedload(Imagem.despesa))
+        .order_by(Imagem.data_upload.desc())
+    )
+
+    pag = q.paginate(page=page, per_page=per_page, error_out=False)
+
+    return render_template(
+        "ver_comprovantes.html",
+        imagens=pag.items,
+        pag=pag
+    )
+
 @despesa_bp.route('/imagem/<int:id>')
 @login_required
 def imagem_blob(id):
@@ -141,7 +353,7 @@ def imagem_blob(id):
     mime_type = kind.mime if kind else "image/png"
     return Response(imagem.imagem, mimetype=mime_type)
 
-# 🔹 Download da imagem
+
 @despesa_bp.route('/download_imagem/<int:id>')
 @login_required
 def download_imagem(id):
@@ -163,7 +375,7 @@ def download_imagem(id):
         headers={"Content-Disposition": f"attachment; filename={nome_arquivo}"}
     )
 
-# 🔹 Exportação em PDF
+
 @despesa_bp.route('/exportar_pdf', methods=['GET'])
 @login_required
 def exportar_pdf():
@@ -199,7 +411,6 @@ def exportar_pdf():
     for d in despesas:
         if d.nome_colaborador != colaborador_atual:
             if colaborador_atual:
-                # Total anterior
                 pdf.set_font("Arial", "B", 10)
                 pdf.cell(0, 8, f"Total do colaborador: R$ {total_colab:,.2f}", ln=True)
                 pdf.ln(5)
@@ -225,17 +436,14 @@ def exportar_pdf():
         total_colab += d.valor
         total_geral += d.valor
 
-    # Último colaborador
     if colaborador_atual:
         pdf.set_font("Arial", "B", 10)
         pdf.cell(0, 8, f"Total do colaborador: R$ {total_colab:,.2f}", ln=True)
 
-    # Total geral
     pdf.ln(10)
     pdf.set_font("Arial", "B", 12)
     pdf.cell(0, 10, f"Total Geral: R$ {total_geral:,.2f}", ln=True, align="R")
 
-    # ✅ Correção aqui:
     pdf_bytes = pdf.output(dest='S').encode('latin-1')
     output = BytesIO(pdf_bytes)
     output.seek(0)
@@ -244,7 +452,6 @@ def exportar_pdf():
     return send_file(output, download_name=f"{nome}_gastos.pdf", as_attachment=True)
 
 
-# 🔹 Exportação em Excel
 @despesa_bp.route('/exportar_excel', methods=['GET'])
 @login_required
 def exportar_excel():
@@ -254,7 +461,6 @@ def exportar_excel():
 
     query = Despesa.query
 
-    # ✅ Conversão das datas
     if data_inicio and data_fim:
         try:
             inicio = datetime.strptime(data_inicio, "%Y-%m-%d")
@@ -269,10 +475,9 @@ def exportar_excel():
 
     despesas = query.order_by(Despesa.nome_colaborador, Despesa.data_registro).all()
 
-    # Montar DataFrame
-    data = []
+    data_out = []
     for d in despesas:
-        data.append({
+        data_out.append({
             "Colaborador": d.nome_colaborador,
             "Data": d.data_registro.strftime('%d/%m/%Y'),
             "Descrição": d.descricao,
@@ -287,7 +492,7 @@ def exportar_excel():
             "Observação": d.observacao or "",
         })
 
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(data_out)
 
     output = BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
@@ -295,8 +500,15 @@ def exportar_excel():
     output.seek(0)
 
     nome = filtro_nome or "relatorio_completo"
-    return send_file(output, download_name=f"{nome}_gastos.xlsx", as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    return send_file(
+        output,
+        download_name=f"{nome}_gastos.xlsx",
+        as_attachment=True,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
 
+
+# ======= (demais rotas de exportação permanecem iguais) =======
 @despesa_bp.route('/exportar_pdf_cartao', methods=['GET'])
 @login_required
 def exportar_pdf_cartao():
@@ -318,9 +530,7 @@ def exportar_pdf_cartao():
     agrupado = {}
     for d in despesas:
         numero = d.num_cartao or "Não informado"
-        if numero not in agrupado:
-            agrupado[numero] = []
-        agrupado[numero].append(d)
+        agrupado.setdefault(numero, []).append(d)
 
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
@@ -360,7 +570,6 @@ def exportar_pdf_cartao():
     pdf.set_font("Arial", "B", 12)
     pdf.cell(0, 10, f"Total Geral: R$ {total_geral:,.2f}", ln=True, align="R")
 
-    # Exportação segura
     pdf_output = BytesIO()
     pdf_content = pdf.output(dest='S').encode('latin-1')
     pdf_output.write(pdf_content)
@@ -369,12 +578,9 @@ def exportar_pdf_cartao():
     return send_file(pdf_output, download_name="gastos_por_cartao.pdf", as_attachment=True)
 
 
-
 @despesa_bp.route('/exportar_excel_cartao', methods=['GET'])
 @login_required
 def exportar_excel_cartao():
-    import pandas as pd
-
     data_inicio = request.args.get("data_inicio")
     data_fim = request.args.get("data_fim")
 
@@ -385,7 +591,10 @@ def exportar_excel_cartao():
         flash("Datas inválidas", "danger")
         return redirect(url_for("relatorio_bp.relatorio_gastos_cartao"))
 
-    despesas = Despesa.query.filter(Despesa.data_registro >= inicio, Despesa.data_registro <= fim).all()
+    despesas = Despesa.query.filter(
+        Despesa.data_registro >= inicio,
+        Despesa.data_registro <= fim
+    ).all()
 
     dados = []
     for d in despesas:
@@ -410,8 +619,6 @@ def exportar_excel_cartao():
 @despesa_bp.route('/exportar_pdf_projeto', methods=['GET'])
 @login_required
 def exportar_pdf_projeto():
-    from fpdf import FPDF
-
     data_inicio = request.args.get("data_inicio")
     data_fim = request.args.get("data_fim")
 
@@ -422,7 +629,10 @@ def exportar_pdf_projeto():
         flash("Datas inválidas", "danger")
         return redirect(url_for("relatorio_bp.relatorio_gastos_projeto"))
 
-    despesas = Despesa.query.filter(Despesa.data_registro >= inicio, Despesa.data_registro <= fim).all()
+    despesas = Despesa.query.filter(
+        Despesa.data_registro >= inicio,
+        Despesa.data_registro <= fim
+    ).all()
 
     agrupado = {}
     for d in despesas:
@@ -475,8 +685,6 @@ def exportar_pdf_projeto():
 @despesa_bp.route('/exportar_excel_projeto', methods=['GET'])
 @login_required
 def exportar_excel_projeto():
-    import pandas as pd
-
     data_inicio = request.args.get("data_inicio")
     data_fim = request.args.get("data_fim")
 
@@ -487,7 +695,10 @@ def exportar_excel_projeto():
         flash("Datas inválidas", "danger")
         return redirect(url_for("relatorio_bp.relatorio_gastos_projeto"))
 
-    despesas = Despesa.query.filter(Despesa.data_registro >= inicio, Despesa.data_registro <= fim).all()
+    despesas = Despesa.query.filter(
+        Despesa.data_registro >= inicio,
+        Despesa.data_registro <= fim
+    ).all()
 
     dados = []
     for d in despesas:
@@ -507,11 +718,10 @@ def exportar_excel_projeto():
 
     return send_file(output, download_name="gastos_por_projeto.xlsx", as_attachment=True)
 
+
 @despesa_bp.route('/exportar_pdf_empresa', methods=['GET'])
 @login_required
 def exportar_pdf_empresa():
-    from fpdf import FPDF
-
     data_inicio = request.args.get("data_inicio")
     data_fim = request.args.get("data_fim")
 
@@ -522,7 +732,10 @@ def exportar_pdf_empresa():
         flash("Datas inválidas", "danger")
         return redirect(url_for("relatorio_bp.relatorio_gastos_empresa"))
 
-    despesas = Despesa.query.filter(Despesa.data_registro >= inicio, Despesa.data_registro <= fim).all()
+    despesas = Despesa.query.filter(
+        Despesa.data_registro >= inicio,
+        Despesa.data_registro <= fim
+    ).all()
 
     agrupado = {}
     for d in despesas:
@@ -571,11 +784,10 @@ def exportar_pdf_empresa():
 
     return send_file(output, download_name="gastos_por_empresa.pdf", as_attachment=True)
 
+
 @despesa_bp.route('/exportar_excel_empresa', methods=['GET'])
 @login_required
 def exportar_excel_empresa():
-    import pandas as pd
-
     data_inicio = request.args.get("data_inicio")
     data_fim = request.args.get("data_fim")
 
@@ -586,7 +798,10 @@ def exportar_excel_empresa():
         flash("Datas inválidas", "danger")
         return redirect(url_for("relatorio_bp.relatorio_gastos_empresa"))
 
-    despesas = Despesa.query.filter(Despesa.data_registro >= inicio, Despesa.data_registro <= fim).all()
+    despesas = Despesa.query.filter(
+        Despesa.data_registro >= inicio,
+        Despesa.data_registro <= fim
+    ).all()
 
     dados = []
     for d in despesas:
@@ -606,6 +821,7 @@ def exportar_excel_empresa():
 
     return send_file(output, download_name="gastos_por_empresa.xlsx", as_attachment=True)
 
+
 @despesa_bp.route('/controle_despesas', methods=['GET'])
 @login_required
 def controle_despesas():
@@ -621,4 +837,3 @@ def excluir_despesa(id):
     db.session.commit()
     flash("Despesa excluída com sucesso!", "success")
     return redirect(url_for('despesa_bp.controle_despesas'))
-

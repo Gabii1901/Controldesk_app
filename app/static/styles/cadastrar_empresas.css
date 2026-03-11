@@ -1,101 +1,185 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f8f8;
-    text-align: center;
-    margin: 0;
-    padding: 0;
+/* ===== BASE CONTROL DESK (essencial p/ aplicar cd-body/top-bar/cd-wrap) ===== */
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
+/* ===== ALTURA HEADER ===== */
+:root { --topbar-h: 76px; }
+html { scroll-padding-top: calc(var(--topbar-h) + 16px); }
+
+/* ===== BODY + FUNDO ===== */
+.cd-body {
+  margin: 0;
+  background-color: #cfeee2;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
 
-.title {
-    font-size: 28px;
-    font-weight: bold;
+/* Marca d’água */
+.cd-body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/static/Imagens/logosemfundo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 480px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
 }
 
+.cd-body > * { position: relative; z-index: 1; }
+
+/* ===== HEADER ===== */
+.top-bar {
+  width: 100%;
+  height: var(--topbar-h);
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #5e4f34;
+  color: #fff;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+}
+
+.cd-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+/* Botão voltar */
 .btn-voltar {
-    background-color: red;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 16px;
+  color: #fff;
+  font-size: 22px;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 10px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.btn-voltar:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.1);
 }
 
-.btn-empresas {
-    background-color: orange;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    font-size: 18px;
-    border-radius: 10px;
-    margin: 20px;
+/* ===== WRAP ===== */
+.cd-wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: calc(var(--topbar-h) + 40px) 16px 48px;
 }
 
-.form-container {
-    background-color: white;
-    padding: 20px;
-    width: 500px;
-    margin: 20px auto;
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+/* Título */
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 28px;
+  color: #1f1f1f;
 }
 
-.form-title {
-    background-color: #90ee90;
-    padding: 10px;
-    border-radius: 10px;
-    font-size: 18px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* ====== AQUI COMEÇA O CSS DO FORM ====== */
+
+/* ===== CARD FORM ===== */
+.card-form {
+  max-width: 520px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 28px 30px;
+  border-radius: 22px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.12);
 }
 
-input {
-    width: 90%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
+/* ===== FORM ===== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
 }
 
-.button-group {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
+.form-group label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2b2b2b;
 }
 
-.btn-salvar {
-    background-color: green;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    font-size: 18px;
-    border-radius: 10px;
-    cursor: pointer;
+.form-group input {
+  padding: 12px 14px;
+  font-size: 15px;
+  border-radius: 12px;
+  border: 1px solid #cfcfcf;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.05s ease;
 }
 
-.btn-cancelar {
-    background-color: red;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    font-size: 18px;
-    border-radius: 10px;
-    text-decoration: none;
-    cursor: pointer;
+.form-group input:focus {
+  outline: none;
+  border-color: #2fa36b;
+  box-shadow: 0 0 0 3px rgba(47, 163, 107, 0.20);
 }
 
-.btn-salvar:hover,
-.btn-cancelar:hover {
-    opacity: 0.8;
+/* ===== AÇÕES ===== */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 26px;
+  flex-wrap: wrap;
+}
+
+/* Botão principal */
+.btn-primary {
+  background-color: #2fa36b;
+  color: #fff;
+  border: none;
+  padding: 12px 26px;
+  font-size: 15px;
+  font-weight: 800;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.btn-primary:hover {
+  background-color: #238557;
+  transform: scale(1.04);
+}
+
+/* Botão secundário */
+.btn-secondary {
+  background-color: #b64b4b;
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 26px;
+  font-size: 15px;
+  font-weight: 800;
+  border-radius: 14px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.btn-secondary:hover {
+  background-color: #943737;
+  transform: scale(1.04);
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 480px) {
+  :root { --topbar-h: 70px; }
+
+  .cd-body::before {
+    background-size: 360px;
+    opacity: 0.08;
+  }
+
+  .card-form { padding: 22px 20px; }
+
+  .actions { flex-direction: column; }
 }

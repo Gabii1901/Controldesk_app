@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ControlDesk - Confirmar Despesa</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/despesas.css') }}">
+
+  <style>
+    .confirm-wrap { max-width: 520px; margin: 0 auto; }
+    .brand-pill {
+      background: #f4a300;
+      color: #fff;
+      font-weight: 800;
+      text-align: center;
+      border-radius: 999px;
+      padding: 14px 18px;
+      margin: 12px auto 18px;
+      width: 100%;
+      box-sizing: border-box;
+      letter-spacing: .4px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 10px 22px rgba(0,0,0,.10);
+    }
+    .card h2 {
+      text-align: center;
+      margin: 6px 0 16px;
+      font-size: 16px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .row { margin: 10px 0; }
+    .label { font-weight: 800; display:block; margin-bottom: 4px; }
+    .value { font-weight: 600; color: #222; }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+    .money { font-weight: 900; }
+    .total-line {
+      display:flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+      font-weight: 900;
+    }
+
+    .img-preview {
+      width: 100%;
+      border-radius: 10px;
+      margin-top: 8px;
+      border: 1px solid #e6e6e6;
+      max-height: 260px;
+      object-fit: contain;
+      background: #fafafa;
+    }
+
+    .actions {
+      margin-top: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .btn-ok {
+      background: #2ecc71;
+      border: none;
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-weight: 900;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .btn-back {
+      background: #e74c3c;
+      border: none;
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-weight: 900;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .hint {
+      color:#666;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container confirm-wrap">
+    <div class="brand-pill">CONTROLDESK</div>
+
+    <div class="card">
+      <h2>Confira as informações</h2>
+
+      <div class="row">
+        <span class="label">Nome do colaborador:</span>
+        <span class="value">{{ colaborador.nome }}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">Cidade onde se localiza?</span>
+        <span class="value">{{ (dados.cidade or '')|upper }}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">Nome do local:</span>
+        <span class="value">{{ (dados.local or '')|upper }}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">CPF/CNPJ do local:</span>
+        <span class="value">{{ dados.cnpj_cpf_local or 'Não informado' }}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">Número do documento:</span>
+        <span class="value">{{ dados.numero_documento or 'Não informado' }}</span>
+      </div>
+
+      <div class="row two-col">
+        <div>
+          <span class="label">Com o que foi a sua despesa?</span>
+          <span class="value">{{ dados.descricao or '' }}</span>
+
+          {% if dados.observacao %}
+            <div class="hint"><strong>Obs:</strong> {{ dados.observacao }}</div>
+          {% endif %}
+          {% if dados.complemento %}
+            <div class="hint"><strong>Complemento:</strong> {{ dados.complemento }}</div>
+          {% endif %}
+        </div>
+
+        <div>
+          <span class="label">Valor</span>
+          <span class="value money">{{ valor_formatado }}</span>
+        </div>
+      </div>
+
+      <div class="total-line">
+        <span>Total:</span>
+        <span>{{ valor_formatado }}</span>
+      </div>
+
+      <div class="row" style="margin-top: 14px;">
+        <span class="label">Em qual projeto está trabalhando hoje?</span>
+        <span class="value">{{ projeto_nome or 'Não informado' }}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">Foto do comprovante aqui:</span>
+        <span class="value">{{ imagem_nome or 'Não informado' }}</span>
+
+        {# ✅ NOVO: preview vem do arquivo temporário (não mais base64 na sessão) #}
+        {% if imagem_preview_url %}
+          <img class="img-preview" src="{{ imagem_preview_url }}" alt="Comprovante" />
+        {% else %}
+          <div class="hint">Nenhuma imagem carregada.</div>
+        {% endif %}
+      </div>
+
+      <div class="actions">
+        <!-- Confirmar = grava no banco -->
+        <form method="POST" action="{{ url_for('despesa_bp.despesa_confirmar_salvar') }}">
+          <button type="submit" class="btn-ok">Confirmar</button>
+        </form>
+
+        <!-- Voltar (pra editar) -->
+        <a class="btn-back" href="{{ url_for('despesa_bp.cadastro_despesa_page') }}">Voltar</a>
+
+        {# opcional: botão cancelar que limpa o tmp + sessão #}
+        {# 
+        <form method="POST" action="{{ url_for('despesa_bp.despesa_confirmar_cancelar') }}">
+          <button type="submit" class="btn-back" style="background:#6c757d;">Cancelar</button>
+        </form>
+        #}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

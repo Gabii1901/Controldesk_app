@@ -1,29 +1,56 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Editar Usuário - ControlDesk</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/editar_usuario.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar Usuário - ControlDesk</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/editar_usuario.css') }}?v=3">
 </head>
-<body>
-    <header>
-        <h1 class="title">Editar Usuário</h1>
-        <a href="{{ url_for('user_bp.listar_usuarios_page') }}" class="btn-voltar">⮌ Voltar</a>
-    </header>
 
-    <div class="form-container">
-        <form method="POST">
-            <label for="nome">Nome:</label>
-            <input type="text" name="nome" id="nome" value="{{ usuario.nome }}" required>
+<body class="cd-body">
 
-            <label for="cpf">CPF:</label>
-            <input type="text" name="cpf" id="cpf" value="{{ usuario.cpf }}" required>
+  <header class="top-bar">
+    <h1 class="cd-title">ControlDesk</h1>
+    <a href="{{ url_for('user_bp.listar_usuarios_page') }}" class="btn-voltar" title="Voltar">⮌</a>
+  </header>
 
-            <label for="senha">Nova Senha:</label>
-            <input type="password" name="senha" id="senha" placeholder="Deixe em branco para não alterar">
+  <main class="cd-wrap">
+    <h2 class="page-title">Editar Usuário</h2>
 
-            <button type="submit" class="btn-salvar">Salvar Alterações</button>
-        </form>
+    <div class="card-form">
+
+      <div class="entity-pill">
+        <span class="pill-title">{{ usuario.nome }}</span>
+        <span class="pill-sub">CPF: {{ usuario.cpf }}</span>
+      </div>
+
+      <!-- Mantive POST no mesmo endpoint atual (method POST sem action) -->
+      <form method="POST">
+
+        <div class="form-group">
+          <label for="nome">Nome</label>
+          <input type="text" name="nome" id="nome" value="{{ usuario.nome }}" required>
+        </div>
+
+        <div class="form-group">
+          <label for="cpf">CPF</label>
+          <input type="text" name="cpf" id="cpf" value="{{ usuario.cpf }}" required>
+        </div>
+
+        <div class="form-group">
+          <label for="senha">Nova Senha (opcional)</label>
+          <input type="password" name="senha" id="senha" placeholder="Deixe em branco para não alterar">
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary">💾 Salvar Alterações</button>
+          <a href="{{ url_for('user_bp.listar_usuarios_page') }}" class="btn-secondary">❌ Cancelar</a>
+        </div>
+
+      </form>
     </div>
+  </main>
+
 </body>
 </html>

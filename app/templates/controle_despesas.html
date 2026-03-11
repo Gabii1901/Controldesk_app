@@ -1,37 +1,70 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Controle de Despesas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/controle_despesas.css') }}">
-</head>
-<body>
-    <header>
-        <h1>Controle de Despesas</h1>
-        <a href="{{ url_for('dashboard_bp.dashboard') }}" class="btn-voltar">⮌ Voltar</a>
-    </header>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Despesas - ControlDesk</title>
 
-    <div class="despesa-lista">
-        {% for despesa in despesas %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/controle_despesas.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body class="cd-body">
+
+  <!-- HEADER -->
+  <header class="top-bar">
+    <h1 class="cd-title">CONTROLDESK</h1>
+
+    <a href="{{ url_for('dashboard_bp.dashboard') }}" class="btn-voltar" title="Voltar">
+      <i class="fa-solid fa-arrow-left"></i>
+    </a>
+  </header>
+
+  <!-- CONTEÚDO -->
+  <div class="cd-wrap">
+
+    <div class="page-title">Controle de Despesas</div>
+
+    <div class="lista-despesas">
+      {% for despesa in despesas %}
         <div class="despesa-card">
-            <p>
-                <strong>{{ despesa.nome_colaborador }}</strong> —
-                R$ {{ "{:,.2f}".format(despesa.valor).replace(",", "X").replace(".", ",").replace("X", ".") }}
-            </p>
-            <p>{{ despesa.descricao }}</p>
-            <p>
-                <small>
-                    {% if despesa.data_registro %}
-                        {{ despesa.data_registro.strftime('%d/%m/%Y') }}
-                    {% else %}
-                        Data não informada
-                    {% endif %}
-                </small>
-            </p>
-            <a href="{{ url_for('despesa_bp.excluir_despesa', id=despesa.id) }}" 
-               onclick="return confirm('Deseja excluir esta despesa?')">🗑️ Excluir</a>
+
+          <div class="despesa-info">
+            <strong>{{ despesa.nome_colaborador }}</strong>
+
+            <span class="valor">
+              R$
+              {{ "{:,.2f}".format(despesa.valor)
+                  .replace(",", "X")
+                  .replace(".", ",")
+                  .replace("X", ".") }}
+            </span>
+
+            <p class="descricao">{{ despesa.descricao }}</p>
+
+            <small>
+              {% if despesa.data_registro %}
+                {{ despesa.data_registro.strftime('%d/%m/%Y') }}
+              {% else %}
+                Data não informada
+              {% endif %}
+            </small>
+          </div>
+
+          <a
+            href="{{ url_for('despesa_bp.excluir_despesa', id=despesa.id) }}"
+            class="excluir-btn"
+            onclick="return confirm('Deseja excluir esta despesa?')"
+            title="Excluir despesa"
+          >
+            <i class="fa-solid fa-trash"></i>
+          </a>
+
         </div>
-        {% endfor %}
+      {% endfor %}
     </div>
+
+  </div>
+
 </body>
 </html>

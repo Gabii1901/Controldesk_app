@@ -1,32 +1,63 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ControlDesk - Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ControlDesk - Dashboard</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
+
+  <!-- Font Awesome (CDN) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
-    <header>
-        <h1 class="title">ControlDesk</h1>
-        <div class="logout-container">
-            <a href="{{ url_for('auth_bp.logout') }}" class="sair-btn">
-                <i class="fas fa-sign-out-alt"></i>Sair
-            </a>
-        </div>
-    </header>
+  <header class="top-bar">
+    <h1 class="title">CONTROLDESK</h1>
 
-    <div class="container">
-        <a href="{{ url_for('empresa_bp.listar_empresas') }}" class="menu-btn">Empresas</a>
-        <a href="{{ url_for('projeto_bp.listar_projetos') }}" class="menu-btn">Projetos</a>
-        <a href="{{ url_for('colaborador_bp.listar_colaboradores') }}" class="menu-btn">Colaboradores</a>
-        <a href="{{ url_for('user_bp.listar_usuarios_page') }}" class="menu-btn">Usuários</a>
-        <a href="{{ url_for('relatorio_bp.listar_relatorios') }}" class="menu-btn">Relatórios</a>
-        <a href="{{ url_for('despesa_bp.controle_despesas') }}" class="menu-btn">Controle de Despesas</a>
-        <a href="{{ url_for('despesa_bp.ver_comprovantes') }}" class="menu-btn">Ver Comprovantes</a>
+    <div class="logout-container">
+      <a href="{{ url_for('auth_bp.logout') }}" class="sair-btn" title="Sair">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </a>
     </div>
+  </header>
+
+  <div class="container">
+    <a href="{{ url_for('empresa_bp.listar_empresas') }}" class="menu-btn">
+      <span class="icon"><i class="fa-solid fa-building"></i></span>
+      <span>Empresas</span>
+    </a>
+
+    <a href="{{ url_for('projeto_bp.listar_projetos') }}" class="menu-btn">
+      <span class="icon"><i class="fa-solid fa-diagram-project"></i></span>
+      <span>Projetos</span>
+    </a>
+
+    <a href="{{ url_for('colaborador_bp.listar_colaboradores') }}" class="menu-btn">
+      <span class="icon"><i class="fa-solid fa-users"></i></span>
+      <span>Colaboradores</span>
+    </a>
+
+    <a href="{{ url_for('user_bp.listar_usuarios_page') }}" class="menu-btn">
+      <span class="icon"><i class="fa-solid fa-user-gear"></i></span>
+      <span>Usuários</span>
+    </a>
+
+    <a href="{{ url_for('relatorio_bp.listar_relatorios') }}" class="menu-btn">
+      <span class="icon"><i class="fa-solid fa-file-lines"></i></span>
+      <span>Relatórios</span>
+    </a>
+
+    <a href="{{ url_for('despesa_bp.controle_despesas') }}" class="menu-btn">
+      <span class="icon"><i class="fa-solid fa-wallet"></i></span>
+      <span>Controle de Despesas</span>
+    </a>
+
+    <a href="{{ url_for('despesa_bp.ver_comprovantes') }}" class="menu-btn">
+      <span class="icon"><i class="fa-solid fa-receipt"></i></span>
+      <span>Ver Comprovantes</span>
+    </a>
+  </div>
 
 </body>
 </html>
