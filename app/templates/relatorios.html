@@ -13,6 +13,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
+  <!-- Chart.js (gráficos por IA) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
   <style>
     .modal-exportar-backdrop {
       position: fixed;
@@ -109,6 +112,102 @@
       background: #f1f1f1;
       color: #333;
     }
+
+    /* ===== Gráfico por IA ===== */
+    .ia-grafico-card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+      padding: 18px 20px;
+      margin-bottom: 20px;
+    }
+
+    .ia-grafico-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+      color: #5e4f34;
+      font-weight: 700;
+    }
+
+    .ia-grafico-sub {
+      margin: 0 0 14px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .ia-grafico-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .ia-grafico-form input {
+      flex: 1 1 260px;
+      padding: 11px 14px;
+      border: 1px solid #d8dfdb;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .ia-grafico-form input:focus {
+      outline: none;
+      border-color: #2fa36b;
+      box-shadow: 0 0 0 3px rgba(47, 163, 107, 0.15);
+    }
+
+    .btn-ia-gerar {
+      background: #2fa36b;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-ia-gerar:hover {
+      background: #278a5b;
+      transform: translateY(-1px);
+    }
+
+    .btn-ia-gerar:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .ia-grafico-status {
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    .ia-grafico-status.erro {
+      color: #b24b3f;
+    }
+
+    .ia-grafico-status.carregando {
+      color: #5e4f34;
+    }
+
+    .ia-grafico-canvas-wrap {
+      margin-top: 18px;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+      display: none;
+    }
+
+    .ia-grafico-canvas-wrap.ativo {
+      display: block;
+    }
   </style>
 </head>
 
@@ -140,8 +239,35 @@
       </div>
     </div>
 
-    <div class="table-card">
-      <div class="table-responsive">
+    <div class="ia-grafico-card">
+      <div class="ia-grafico-head">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span>Gráfico com IA</span>
+      </div>
+      <p class="ia-grafico-sub">Descreva o gráfico que você quer ver, em português — pode filtrar por nome, cartão, projeto, empresa, valor, data ou descrição da despesa. Ex.: "gastos com almoço do cartão 0546 este ano" ou "despesas acima de R$ 500 por colaborador".</p>
+
+      <div class="ia-grafico-form">
+        <input type="text" id="iaPergunta" placeholder="Ex: gráfico de gastos por empresa nos últimos 3 meses" maxlength="200">
+        <button type="button" class="btn-ia-gerar" id="btnIaGerar" onclick="gerarGraficoIA()">
+          <i class="fa-solid fa-chart-simple"></i>
+          <span>Gerar gráfico</span>
+        </button>
+      </div>
+
+      <div class="ia-grafico-status" id="iaStatus"></div>
+
+      <div class="ia-grafico-canvas-wrap" id="iaCanvasWrap">
+        <canvas id="iaCanvas"></canvas>
+      </div>
+    </div>
+
+    <div class="scroll-hint" id="scrollHint">
+      <span>Arraste a tabela para o lado para ver todas as colunas</span>
+      <i class="fa-solid fa-arrow-right"></i>
+    </div>
+
+    <div class="table-card" id="tableCard">
+      <div class="table-responsive" id="tableResponsive">
         <table class="relatorio-table">
 
           <thead>
@@ -153,6 +279,7 @@
               <th>Valor</th>
               <th>Data</th>
               <th>Descrição da despesa</th>
+              <th>Comprovante</th>
             </tr>
 
             <tr class="filters-row">
@@ -163,6 +290,7 @@
               <th><input type="text" id="filtroValor" placeholder="Filtrar valor"></th>
               <th><input type="text" id="filtroData" placeholder="MM/AAAA ou DD/MM/AAAA" maxlength="10"></th>
               <th><input type="text" id="filtroDescricao" placeholder="Filtrar descrição"></th>
+              <th></th>
             </tr>
           </thead>
 
@@ -176,6 +304,18 @@
               <td>{{ item.valor }}</td>
               <td>{{ item.data }}</td>
               <td>{{ item.descricao_despesa }}</td>
+              <td class="comprovante-cell">
+                {% if item.imagem_id %}
+                  <a href="{{ url_for('despesa_bp.imagem_blob', id=item.imagem_id) }}" target="_blank" rel="noopener" class="comprovante-btn" title="Ver comprovante">
+                    <i class="fa-solid fa-eye"></i>
+                  </a>
+                  <a href="{{ url_for('despesa_bp.download_imagem', id=item.imagem_id) }}" class="comprovante-btn" title="Baixar comprovante">
+                    <i class="fa-solid fa-download"></i>
+                  </a>
+                {% else %}
+                  <span class="comprovante-vazio" title="Sem comprovante">—</span>
+                {% endif %}
+              </td>
             </tr>
             {% endfor %}
           </tbody>
@@ -184,7 +324,7 @@
             <tr class="linha-total">
               <td colspan="4"><strong>Total das despesas:</strong></td>
               <td id="totalValor"><strong>R$ 0,00</strong></td>
-              <td colspan="2"></td>
+              <td colspan="3"></td>
             </tr>
           </tfoot>
 
@@ -227,6 +367,10 @@
   </div>
 
   <script>
+    const APP_NOME = "ControlDesk";
+    const USUARIO_NOME = {{ usuario_nome | tojson }};
+    const LOGO_URL = "{{ url_for('static', filename='Imagens/logosemfundo.png') }}";
+
     const filtros = {
       nome: document.getElementById('filtroNome'),
       cartao: document.getElementById('filtroCartao'),
@@ -392,11 +536,79 @@
       return linhasHtml;
     }
 
-    function imprimirRelatorio() {
+    function temGraficoVisivel() {
+      return !!iaChart && document.getElementById('iaCanvasWrap').classList.contains('ativo');
+    }
+
+    function montarCabecalhoImpressao(dataHora, tituloDocumento) {
+      return `
+        <div class="print-header">
+          <img src="${LOGO_URL}" alt="Logo" class="print-logo">
+          <div class="print-header-textos">
+            <div class="print-app-nome">${escaparHtml(APP_NOME)}</div>
+            <div class="print-titulo">${escaparHtml(tituloDocumento)}</div>
+          </div>
+        </div>
+        <div class="print-meta">
+          <span><strong>Impresso por:</strong> ${escaparHtml(USUARIO_NOME)}</span>
+          <span><strong>Em:</strong> ${escaparHtml(dataHora)}</span>
+        </div>
+        <div class="print-divisor"></div>
+      `;
+    }
+
+    function montarCorpoGrafico() {
+      const imgGrafico = iaChart.toBase64Image('image/png', 1);
+      return `
+        <div class="print-grafico-wrap">
+          <img src="${imgGrafico}" alt="Gráfico" class="print-grafico-img">
+        </div>
+      `;
+    }
+
+    function montarCorpoTabela(comSubtitulo) {
       const dados = getLinhasVisiveis();
       const total = document.getElementById('totalValor').textContent.trim();
-      const dataHora = getDataHoraImpressao();
       const linhasHtml = montarLinhasHtml(dados);
+      const subtitulo = comSubtitulo ? '<div class="print-subtitulo">Despesas detalhadas</div>' : '';
+
+      return `
+        ${subtitulo}
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Cartão</th>
+              <th>Projeto</th>
+              <th>Empresa</th>
+              <th>Valor</th>
+              <th>Data</th>
+              <th>Descrição da despesa</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${linhasHtml}
+          </tbody>
+        </table>
+
+        <table class="total-final">
+          <tr>
+            <td colspan="4">Total das despesas:</td>
+            <td>${escaparHtml(total)}</td>
+            <td colspan="2"></td>
+          </tr>
+        </table>
+      `;
+    }
+
+    function imprimirRelatorio() {
+      const dataHora = getDataHoraImpressao();
+      const comGrafico = temGraficoVisivel();
+
+      const tituloDocumento = comGrafico ? ultimoGraficoTitulo : 'Relatório de Despesas';
+      const corpoHtml = comGrafico
+        ? montarCorpoGrafico() + montarCorpoTabela(true)
+        : montarCorpoTabela(false);
 
       const janela = window.open('', '_blank');
 
@@ -405,26 +617,76 @@
         <html lang="pt-BR">
         <head>
           <meta charset="UTF-8">
-          <title>Relatório de Despesas</title>
+          <title>${escaparHtml(tituloDocumento)} - ${escaparHtml(APP_NOME)}</title>
           <style>
+            * { box-sizing: border-box; }
+
             body {
-              font-family: Arial, sans-serif;
-              margin: 30px;
-              color: #222;
+              font-family: 'Segoe UI', Arial, sans-serif;
+              margin: 28px 34px;
+              color: #1f1f1f;
             }
 
-            .titulo {
-              text-align: center;
-              font-size: 24px;
-              font-weight: bold;
-              margin-bottom: 6px;
+            .print-header {
+              display: flex;
+              align-items: center;
+              gap: 16px;
+              border-bottom: 3px solid #5e4f34;
+              padding-bottom: 14px;
             }
 
-            .subtitulo {
-              text-align: center;
+            .print-logo {
+              width: 56px;
+              height: 56px;
+              object-fit: contain;
+            }
+
+            .print-app-nome {
               font-size: 13px;
+              font-weight: 800;
+              letter-spacing: 1px;
+              color: #5e4f34;
+              text-transform: uppercase;
+            }
+
+            .print-titulo {
+              font-size: 22px;
+              font-weight: 700;
+              margin-top: 2px;
+            }
+
+            .print-meta {
+              display: flex;
+              justify-content: space-between;
+              font-size: 12px;
               color: #555;
-              margin-bottom: 24px;
+              margin-top: 10px;
+            }
+
+            .print-divisor {
+              height: 1px;
+              background: #e0e0e0;
+              margin: 16px 0 22px;
+            }
+
+            .print-grafico-wrap {
+              display: flex;
+              justify-content: center;
+              padding: 10px 0 20px;
+            }
+
+            .print-grafico-img {
+              max-width: 100%;
+              max-height: 480px;
+            }
+
+            .print-subtitulo {
+              font-size: 15px;
+              font-weight: 700;
+              color: #5e4f34;
+              margin: 4px 0 10px;
+              padding-top: 14px;
+              border-top: 1px dashed #ccc;
             }
 
             table {
@@ -466,36 +728,15 @@
               font-weight: bold;
               background: #f8f8f8;
             }
+
+            @media print {
+              body { margin: 12mm 14mm; }
+            }
           </style>
         </head>
         <body>
-          <div class="titulo">RELATÓRIO DE DESPESAS</div>
-          <div class="subtitulo">Impresso em: ${escaparHtml(dataHora)}</div>
-
-          <table>
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Cartão</th>
-                <th>Projeto</th>
-                <th>Empresa</th>
-                <th>Valor</th>
-                <th>Data</th>
-                <th>Descrição da despesa</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${linhasHtml}
-            </tbody>
-          </table>
-
-          <table class="total-final">
-            <tr>
-              <td colspan="4">Total das despesas:</td>
-              <td>${escaparHtml(total)}</td>
-              <td colspan="2"></td>
-            </tr>
-          </table>
+          ${montarCabecalhoImpressao(dataHora, tituloDocumento)}
+          ${corpoHtml}
         </body>
         </html>
       `);
@@ -503,9 +744,11 @@
       janela.document.close();
       janela.focus();
 
-      setTimeout(() => {
+      // Espera a janela (e a logo) carregar antes de imprimir, para não sair com a imagem em branco.
+      janela.onload = () => {
+        janela.focus();
         janela.print();
-      }, 300);
+      };
     }
 
     function exportarPDF() {
@@ -699,6 +942,138 @@
     });
 
     calcularTotal();
+
+    // ===== Indicador de rolagem horizontal da tabela =====
+    (function () {
+      const wrap = document.getElementById('tableResponsive');
+      const card = document.getElementById('tableCard');
+      const hint = document.getElementById('scrollHint');
+
+      function atualizarIndicador() {
+        const temMaisConteudoADireita = wrap.scrollWidth - wrap.clientWidth - wrap.scrollLeft > 4;
+        card.classList.toggle('tem-scroll', temMaisConteudoADireita);
+        hint.classList.toggle('ativo', temMaisConteudoADireita);
+      }
+
+      wrap.addEventListener('scroll', atualizarIndicador);
+      window.addEventListener('resize', atualizarIndicador);
+      atualizarIndicador();
+    })();
+
+    // ===== Gráfico com IA (Groq) =====
+    const PALETA_IA = ['#2fa36b', '#5e4f34', '#b24b3f', '#3f7cb2', '#c99a3f', '#7a5ea8', '#4fb3a9', '#a85e8f'];
+
+    let iaChart = null;
+    let ultimoGraficoTitulo = '';
+
+    function definirStatusIA(mensagem, classe) {
+      const status = document.getElementById('iaStatus');
+      status.textContent = mensagem || '';
+      status.className = 'ia-grafico-status' + (classe ? ' ' + classe : '');
+    }
+
+    async function gerarGraficoIA() {
+      const pergunta = document.getElementById('iaPergunta').value.trim();
+      const botao = document.getElementById('btnIaGerar');
+      const wrap = document.getElementById('iaCanvasWrap');
+
+      if (!pergunta) {
+        definirStatusIA('Descreva o gráfico que você quer gerar.', 'erro');
+        return;
+      }
+
+      botao.disabled = true;
+      definirStatusIA('Gerando gráfico...', 'carregando');
+
+      try {
+        const resposta = await fetch('/api/graficos/ia', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pergunta })
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok || dados.erro) {
+          definirStatusIA(dados.erro || 'Não foi possível gerar o gráfico.', 'erro');
+          wrap.classList.remove('ativo');
+          return;
+        }
+
+        wrap.classList.add('ativo');
+        try {
+          renderizarGraficoIA(dados);
+          definirStatusIA('', '');
+        } catch (erroRender) {
+          console.error(erroRender);
+          definirStatusIA('Os dados chegaram, mas houve um erro ao desenhar o gráfico.', 'erro');
+        }
+      } catch (erro) {
+        console.error(erro);
+        definirStatusIA('Erro de conexão ao gerar o gráfico.', 'erro');
+      } finally {
+        botao.disabled = false;
+      }
+    }
+
+    function renderizarGraficoIA(dados) {
+      const canvas = document.getElementById('iaCanvas');
+      const tipoMap = { barra: 'bar', linha: 'line', pizza: 'pie' };
+      const tipo = tipoMap[dados.tipo_grafico] || 'bar';
+
+      const formatarValor = (v) =>
+        dados.metrica === 'soma_valor'
+          ? v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+          : v.toLocaleString('pt-BR');
+
+      const cores = dados.labels.map((_, i) => PALETA_IA[i % PALETA_IA.length]);
+
+      ultimoGraficoTitulo = dados.titulo || 'Gráfico de despesas';
+
+      if (iaChart) {
+        iaChart.destroy();
+      }
+
+      iaChart = new Chart(canvas, {
+        type: tipo,
+        data: {
+          labels: dados.labels,
+          datasets: [{
+            label: dados.titulo,
+            data: dados.valores,
+            backgroundColor: tipo === 'line' ? 'rgba(47, 163, 107, 0.15)' : cores,
+            borderColor: tipo === 'line' ? '#2fa36b' : cores,
+            borderWidth: tipo === 'line' ? 2 : 1,
+            tension: 0.3,
+            fill: tipo === 'line'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: dados.titulo, color: '#1f1f1f' },
+            legend: { display: tipo === 'pizza' },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => formatarValor(ctx.parsed.y ?? ctx.parsed)
+              }
+            }
+          },
+          scales: tipo === 'pizza' ? {} : {
+            y: {
+              beginAtZero: true,
+              ticks: { callback: (v) => formatarValor(v) }
+            }
+          }
+        }
+      });
+    }
+
+    document.getElementById('iaPergunta').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        gerarGraficoIA();
+      }
+    });
   </script>
 
 </body>

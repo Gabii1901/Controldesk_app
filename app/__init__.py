@@ -40,6 +40,16 @@ def create_app():
     login_manager.init_app(app)
     migrate = Migrate(app, db)
 
+    # ✅ Extensão do Postgres usada pelos filtros dos gráficos por IA
+    # (busca por texto ignorando acento, ex.: "almoço" == "almoco").
+    with app.app_context():
+        try:
+            from sqlalchemy import text
+            db.session.execute(text("CREATE EXTENSION IF NOT EXISTS unaccent"))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
     login_manager.login_view = "auth_bp.login"
     login_manager.login_message_category = "info"
 
@@ -70,6 +80,7 @@ def create_app():
     from app.routes.relatorio_routes import relatorio_bp
     from app.routes.despesa_routes import despesa_bp
     from app.routes.user_routes import user_bp
+    from app.routes.ai_routes import ai_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
@@ -79,6 +90,7 @@ def create_app():
     app.register_blueprint(relatorio_bp)
     app.register_blueprint(despesa_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(ai_bp)
 
     return app
 

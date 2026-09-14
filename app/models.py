@@ -117,13 +117,19 @@ class Imagem(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     despesa_id = db.Column(db.Integer, db.ForeignKey("despesas.id"), nullable=False)
-    imagem = db.Column(db.LargeBinary, nullable=False)
+    # Nullable: novos comprovantes são salvos em disco (ver `caminho`); esta
+    # coluna só ainda tem valor para registros antigos não migrados.
+    imagem = db.Column(db.LargeBinary, nullable=True)
     data_upload = db.Column(
         db.DateTime(timezone=True),
         default=lambda: datetime.now(timezone("America/Sao_Paulo")),
     )
     nome_arquivo = db.Column(db.String(255))
     caminho = db.Column(db.String(255), nullable=False)
+
+    # True depois que o script de compactação reduz resolução/qualidade de
+    # comprovantes com mais de 3 meses (ver scripts/compactar_comprovantes_antigos.py).
+    compactada = db.Column(db.Boolean, nullable=False, server_default="false")
 
     despesa = db.relationship("Despesa", back_populates="imagens")
 

@@ -1,0 +1,13 @@
+.env
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.save
+app/static/uploads/
+.DS_Store
+
+# Ferramentas locais (Claude Code / skills) — não fazem parte do app
+.agents/
+.claude/
+skills-lock.json

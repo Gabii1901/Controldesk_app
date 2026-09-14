@@ -22,7 +22,9 @@ pandas==2.2.3
 pdfkit==1.0.0
 pg8000==1.31.2
 psycopg2==2.9.10
+Pillow==11.3.0
 PyJWT==2.10.1
+requests==2.32.4
 python-dateutil==2.9.0.post0
 pytz==2025.1
 scramp==1.4.5

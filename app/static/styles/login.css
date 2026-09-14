@@ -1,129 +1,206 @@
-/* Estilização do Corpo */
-body {
-    background-color: #b2ff91;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    flex-direction: column;
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-/* Header */
-header {
-    position: absolute;
-    top: 20px;
-    left: 30px;
-    display: flex;
-    align-items: center;
+/* ===== BODY + FUNDO ===== */
+.cd-body {
+  margin: 0;
+  background-color: #cfeee2;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* Logo */
-.logo {
-    width: 120px; /* Ajuste o tamanho conforme necessário */
-    height: auto;
-    margin-right: 10px;
+/* Marca d'água */
+.cd-body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/static/Imagens/logosemfundo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 480px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Título */
-.title {
-    font-size: 32px;
-    font-weight: bold;
-    margin: 0;
+.cd-body > * {
+  position: relative;
+  z-index: 1;
 }
 
-/* Container de Login */
+/* ===== HEADER ===== */
+.top-bar {
+  width: 100%;
+  height: 76px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #5e4f34;
+  color: #fff;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand .logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.cd-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+/* ===== Container de Login ===== */
 .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 96px 16px 40px;
 }
 
-/* Caixa de Login */
+/* ===== Caixa de Login ===== */
 .login-box {
-    background-color: #d4ffb2;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    width: 350px;
-    text-align: center;
+  background: #ffffff;
+  padding: 32px 30px;
+  border-radius: 22px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  width: 350px;
+  max-width: 100%;
+  text-align: center;
 }
 
 /* Ícone do Usuário */
 .user-icon {
-    width: 140px; /* Tamanho maior */
-    height: auto;
-    display: block;
-    margin: 0 auto 20px;
+  width: 110px;
+  height: auto;
+  display: block;
+  margin: 0 auto 20px;
 }
 
 /* Labels */
 label {
-    display: block;
-    text-align: left;
-    font-weight: bold;
-    margin-top: 10px;
+  display: block;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  color: #1f1f1f;
+  margin-top: 12px;
 }
 
 /* Campos de Input */
-input {
-    width: calc(100% - 20px);
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 6px;
+  border: 1px solid #d8dfdb;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Botão de Login */
-.login-btn {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 24px;
-    color: black;
-    margin-top: 10px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.login-btn:hover {
-    color: green;
-}
-
-/* Checkbox "Lembrar-me" */
-.remember-me {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    margin-top: 10px;
-}
-
-input[type="checkbox"] {
-    margin-left: 10px;
-    transform: scale(1.2);
-    accent-color: green;
+input[type="text"]:focus,
+input[type="password"]:focus {
+  outline: none;
+  border-color: #2fa36b;
+  box-shadow: 0 0 0 3px rgba(47, 163, 107, 0.15);
 }
 
 /* Ajuste para o campo de senha com ícone */
 .password-container {
-    position: relative;
-    display: flex;
-    align-items: center;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .password-container input {
-    width: 100%;
-    padding-right: 40px; /* Espaço para o ícone */
+  padding-right: 40px;
 }
 
 .password-container .toggle-password {
-    position: absolute;
-    right: 10px;
-    cursor: pointer;
-    font-size: 18px;
-    color: #333;
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #6b6b6b;
+}
+
+/* Checkbox "Lembrar-me" */
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #555;
+  margin-top: 14px;
+}
+
+.remember-me label {
+  margin: 0;
+  font-weight: 500;
+}
+
+input[type="checkbox"] {
+  transform: scale(1.1);
+  accent-color: #2fa36b;
+}
+
+/* Botão de Login */
+.login-btn {
+  width: 100%;
+  background: #2fa36b;
+  border: none;
+  border-radius: 28px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 20px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 3px 10px rgba(47, 163, 107, 0.3);
+}
+
+.login-btn:hover {
+  background: #278a5b;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(47, 163, 107, 0.35);
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 480px) {
+  .cd-body::before {
+    background-size: 360px;
+    opacity: 0.08;
+  }
+
+  .cd-title {
+    font-size: 16px;
+  }
+
+  .login-box {
+    padding: 26px 22px;
+  }
 }

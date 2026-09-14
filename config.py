@@ -10,6 +10,10 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "sua_chave_secreta")
     JWT_ACCESS_TOKEN_EXPIRES = 7200  # 2 horas
+
+    # Groq (IA para geração de gráficos)
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+    GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
     
     # Configurações de segurança
     SESSION_COOKIE_SECURE = True      # Apenas HTTPS

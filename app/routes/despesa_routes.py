@@ -27,6 +27,17 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 # ajuste se quiser outro lugar:
 TMP_DIR = os.path.join("app", "static", "uploads", "tmp_despesas")
 
+# ✅ pasta definitiva dos comprovantes (antes iam em bytes pro Postgres)
+COMPROVANTES_DIR = os.path.join("app", "static", "uploads", "comprovantes")
+
+
+def _ensure_comprovantes_dir():
+    os.makedirs(COMPROVANTES_DIR, exist_ok=True)
+
+
+def _comprovante_abs_path(nome_arquivo: str) -> str:
+    return os.path.join(COMPROVANTES_DIR, nome_arquivo)
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -181,7 +192,7 @@ def despesa_confirmar_salvar():
         flash("Erro ao salvar a despesa. Verifique os campos e tente novamente.", "danger")
         return redirect(url_for("despesa_bp.despesa_confirmar_page"))
 
-    # ✅ salva imagem (lê do arquivo temporário)
+    # ✅ salva imagem (lê do arquivo temporário e grava em disco, não no BD)
     if tmp_path and os.path.exists(tmp_path):
         try:
             with open(tmp_path, "rb") as f:
@@ -195,9 +206,12 @@ def despesa_confirmar_salvar():
             timestamp = datetime.now(fuso_brasilia).strftime("%Y%m%d_%H%M%S")
             nome_arquivo = secure_filename(f"{nome_colab}_despesa{despesa.id}_{timestamp}.{extensao}")
 
+            _ensure_comprovantes_dir()
+            with open(_comprovante_abs_path(nome_arquivo), "wb") as destino:
+                destino.write(raw)
+
             imagem = Imagem(
                 despesa_id=despesa.id,
-                imagem=raw,
                 nome_arquivo=nome_arquivo,
                 caminho=nome_arquivo,
                 data_upload=datetime.now(fuso_brasilia)
@@ -342,26 +356,40 @@ def ver_comprovantes():
         pag=pag
     )
 
+def _ler_bytes_comprovante(imagem: Imagem) -> bytes | None:
+    """Lê os bytes do comprovante do disco (caminho novo) e, se não existir
+    (registro ainda não migrado), cai para o BLOB antigo salvo no Postgres."""
+    if imagem.caminho:
+        caminho_absoluto = _comprovante_abs_path(imagem.caminho)
+        if os.path.exists(caminho_absoluto):
+            with open(caminho_absoluto, "rb") as f:
+                return f.read()
+
+    return imagem.imagem
+
+
 @despesa_bp.route('/imagem/<int:id>')
 @login_required
 def imagem_blob(id):
     imagem = db.session.get(Imagem, id)
-    if not imagem or not imagem.imagem:
+    raw = _ler_bytes_comprovante(imagem) if imagem else None
+    if not raw:
         return "Imagem não encontrada", 404
 
-    kind = filetype.guess(imagem.imagem)
+    kind = filetype.guess(raw)
     mime_type = kind.mime if kind else "image/png"
-    return Response(imagem.imagem, mimetype=mime_type)
+    return Response(raw, mimetype=mime_type)
 
 
 @despesa_bp.route('/download_imagem/<int:id>')
 @login_required
 def download_imagem(id):
     imagem = db.session.get(Imagem, id)
-    if not imagem or not imagem.imagem:
+    raw = _ler_bytes_comprovante(imagem) if imagem else None
+    if not raw:
         return "Imagem não encontrada", 404
 
-    kind = filetype.guess(imagem.imagem)
+    kind = filetype.guess(raw)
     mime_type = kind.mime if kind else "image/png"
     extensao = kind.extension if kind else "png"
 
@@ -370,7 +398,7 @@ def download_imagem(id):
         nome_arquivo += f".{extensao}"
 
     return Response(
-        imagem.imagem,
+        raw,
         mimetype=mime_type,
         headers={"Content-Disposition": f"attachment; filename={nome_arquivo}"}
     )
@@ -833,7 +861,21 @@ def controle_despesas():
 @login_required
 def excluir_despesa(id):
     despesa = Despesa.query.get_or_404(id)
+
+    # guarda os caminhos antes do cascade apagar as linhas de `imagens`
+    caminhos_para_remover = [
+        _comprovante_abs_path(img.caminho) for img in despesa.imagens if img.caminho
+    ]
+
     db.session.delete(despesa)
     db.session.commit()
+
+    for caminho in caminhos_para_remover:
+        try:
+            if os.path.exists(caminho):
+                os.remove(caminho)
+        except OSError:
+            pass
+
     flash("Despesa excluída com sucesso!", "success")
     return redirect(url_for('despesa_bp.controle_despesas'))

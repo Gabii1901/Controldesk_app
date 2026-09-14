@@ -155,13 +155,60 @@ html {
 .table-responsive {
   width: 100%;
   overflow-x: auto;
+  position: relative;
+}
+
+/* Sombra na borda direita indicando que há mais colunas pra ver */
+.table-card {
+  position: relative;
+}
+
+.table-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 28px;
+  pointer-events: none;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.08));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 5;
+}
+
+.table-card.tem-scroll::after {
+  opacity: 1;
+}
+
+.scroll-hint {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #5e4f34;
+  font-weight: 600;
+  margin: -10px 0 10px;
+}
+
+.scroll-hint.ativo {
+  display: flex;
+}
+
+.scroll-hint i {
+  animation: scroll-hint-mover 1.2s ease-in-out infinite;
+}
+
+@keyframes scroll-hint-mover {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
 }
 
 /* ===== TABELA ===== */
 .relatorio-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1150px;
+  min-width: 1280px;
 }
 
 .relatorio-table thead tr:first-child {
@@ -228,6 +275,38 @@ html {
 
 .relatorio-table td:nth-child(7) {
   min-width: 260px;
+}
+
+.relatorio-table td:nth-child(8),
+.relatorio-table th:nth-child(8) {
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* ===== COLUNA COMPROVANTE ===== */
+.comprovante-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.comprovante-btn {
+  color: #2fa36b;
+  font-size: 15px;
+  text-decoration: none;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.comprovante-btn:hover {
+  background: rgba(47, 163, 107, 0.15);
+  transform: scale(1.1);
+}
+
+.comprovante-vazio {
+  color: #bbb;
 }
 
 /* ===== SCROLL ===== */
