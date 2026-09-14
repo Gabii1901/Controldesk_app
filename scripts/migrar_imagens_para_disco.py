@@ -33,64 +33,78 @@ def _sha256(dados: bytes) -> str:
     return hashlib.sha256(dados).hexdigest()
 
 
+BATCH_SIZE = 20  # processa poucas imagens por vez pra não estourar RAM da VPS
+
+
 def migrar(dry_run: bool = False):
     os.makedirs(COMPROVANTES_DIR, exist_ok=True)
 
-    total = 0
     ja_no_disco = 0
     migradas = 0
     sem_blob = 0
     falhas = []
 
     with app.app_context():
-        imagens = Imagem.query.order_by(Imagem.id).all()
-        total = len(imagens)
+        # só os ids agora (leve); os bytes de cada imagem só são carregados
+        # lote por lote, e descartados da memória (expunge_all) entre lotes
+        todos_ids = [
+            row.id for row in db.session.query(Imagem.id).order_by(Imagem.id).all()
+        ]
+        total = len(todos_ids)
 
-        for img in imagens:
-            caminho_atual = _abs_path(img.caminho) if img.caminho else None
+        for inicio in range(0, total, BATCH_SIZE):
+            lote_ids = todos_ids[inicio:inicio + BATCH_SIZE]
+            lote = Imagem.query.filter(Imagem.id.in_(lote_ids)).all()
 
-            if caminho_atual and os.path.exists(caminho_atual):
-                ja_no_disco += 1
-                continue
+            for img in lote:
+                caminho_atual = _abs_path(img.caminho) if img.caminho else None
 
-            if not img.imagem:
-                sem_blob += 1
-                falhas.append((img.id, "sem bytes no banco e sem arquivo em disco"))
-                continue
+                if caminho_atual and os.path.exists(caminho_atual):
+                    ja_no_disco += 1
+                    continue
 
-            # nome de arquivo único e estável, prefixado pelo id da imagem
-            # para nunca colidir com outro registro
-            base_nome = img.caminho or img.nome_arquivo or f"comprovante_{img.id}"
-            novo_nome = f"{img.id}_{base_nome}"
-            destino = _abs_path(novo_nome)
+                if not img.imagem:
+                    sem_blob += 1
+                    falhas.append((img.id, "sem bytes no banco e sem arquivo em disco"))
+                    continue
 
-            hash_original = _sha256(img.imagem)
+                # nome de arquivo único e estável, prefixado pelo id da imagem
+                # para nunca colidir com outro registro
+                base_nome = img.caminho or img.nome_arquivo or f"comprovante_{img.id}"
+                novo_nome = f"{img.id}_{base_nome}"
+                destino = _abs_path(novo_nome)
 
-            print(f"[{img.id}] gravando {len(img.imagem)} bytes em {destino}"
-                  f"{' (dry-run)' if dry_run else ''}")
+                hash_original = _sha256(img.imagem)
+                tamanho = len(img.imagem)
 
-            if dry_run:
-                migradas += 1
-                continue
+                print(f"[{img.id}] gravando {tamanho} bytes em {destino}"
+                      f"{' (dry-run)' if dry_run else ''}")
 
-            try:
-                with open(destino, "wb") as f:
-                    f.write(img.imagem)
+                if dry_run:
+                    migradas += 1
+                    continue
 
-                with open(destino, "rb") as f:
-                    hash_gravado = _sha256(f.read())
+                try:
+                    with open(destino, "wb") as f:
+                        f.write(img.imagem)
 
-                if hash_gravado != hash_original:
-                    raise ValueError("hash do arquivo gravado não bate com o do banco")
+                    with open(destino, "rb") as f:
+                        hash_gravado = _sha256(f.read())
 
-                img.caminho = novo_nome
-                db.session.commit()
-                migradas += 1
-            except Exception as exc:
-                db.session.rollback()
-                if os.path.exists(destino):
-                    os.remove(destino)
-                falhas.append((img.id, str(exc)))
+                    if hash_gravado != hash_original:
+                        raise ValueError("hash do arquivo gravado não bate com o do banco")
+
+                    img.caminho = novo_nome
+                    db.session.commit()
+                    migradas += 1
+                except Exception as exc:
+                    db.session.rollback()
+                    if os.path.exists(destino):
+                        os.remove(destino)
+                    falhas.append((img.id, str(exc)))
+
+            # libera da memória os bytes já processados deste lote antes do próximo
+            db.session.expunge_all()
 
     print("\n===== Resumo =====")
     print(f"Total de registros em `imagens`: {total}")

@@ -28,6 +28,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from dateutil.relativedelta import relativedelta
 from PIL import Image
+from sqlalchemy.orm import defer
 
 from wsgi import app
 from app import db
@@ -81,6 +82,7 @@ def compactar(dry_run: bool = False, meses: int = 3):
 
         candidatas = (
             db.session.query(Imagem)
+            .options(defer(Imagem.imagem))  # nunca carregar o BLOB antigo pra memória
             .join(Despesa, Imagem.despesa_id == Despesa.id)
             .filter(Despesa.data_registro < data_corte)
             .filter(Imagem.compactada.is_(False))
